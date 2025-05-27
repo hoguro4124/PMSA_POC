@@ -1,11 +1,10 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import UserForm from './components/UserForm.vue';
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
   <div>
-    <UserForm />
+    <h1>My App</h1>
+    <RouterView />
   </div>
 </template>
