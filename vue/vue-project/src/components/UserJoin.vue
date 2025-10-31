@@ -5,19 +5,47 @@
   <div class="p-4">
     <h2 class="text-xl font-bold mb-4">회원 가입</h2>
     <div class="mb-4">
-      <input v-model="user.userId" placeholder="ID" class="border p-2 mr-2" /><br>
-      <input type="password" v-model="user.password" placeholder="비밀번호" class="border p-2 mr-2" /><br>
-      <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="border p-2 mr-2" /><br>
-      <input v-model="user.name" placeholder="이름" class="border p-2 mr-2" /><br>
-      <input v-model="user.phone" placeholder="전화번호" class="border p-2 mr-2" /><br>
-      <input v-model="user.email" placeholder="이메일" class="border p-2 mr-2" /><br>
-      <input type="checkbox" v-model="agree" /> [필수] 개인정보 수집 동의<br>
-      <input type="checkbox" v-model="user.maAgree" /> [선택] 마케팅 수집 동의<br>
-      <input type="checkbox" v-model="user.ageAgree" /> [필수] 만 14세 미만 아동 수집 동의
+      * <input v-model="user.userId" placeholder="ID" class="border p-2 mr-2" /><br>
+      * <input type="password" v-model="user.password" placeholder="비밀번호" class="border p-2 mr-2" /><br>
+      * <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="border p-2 mr-2" /><br>
+      * <input v-model="user.name" placeholder="이름" class="border p-2 mr-2" /><br>
+      * <input v-model="user.phone" placeholder="전화번호" class="border p-2 mr-2" /><br>
+      * <input v-model="user.email" placeholder="이메일" class="border p-2 mr-2" /><br>
+
+      <input type="checkbox" v-model="agree" /> [필수] 개인정보 수집 동의
+      <span @click="requiredtoggle" style="cursor:pointer;">
+        {{ requiredAgree ? '🔺' : '🔻' }}
+      </span><br>
+      <div v-if="requiredAgree" class="mt-2 ml-6 text-gray-700">
+        1. 개인정보 수집 목적<br>
+        1) 회원 관리<br>
+        이용자 식별 및 본인 확인, 가입의사 확인, 불만처리 등 민원처리, 공지사항 전달, 불량회원 부정이용 방지<br>
+        2) 서비스 이용 및 요금 정산<br>
+        광고상품의 청약, 요금 결제, SMS 발신번호 등록/관리<br>
+        2. 개인정보 수집 항목<br>
+        이름, ID, 비밀번호, 이메일<br>
+        3. 개인정보 보유 및 이용 기간<br>
+        회원 탈퇴 시 지체없이 파기(관련 법령의 규정에 의하여 보존할 필요가 있는 경우에는 해당 기간까지 보관 후 파기)
+      </div>
+
+      <input type="checkbox" v-model="user.ageAgree" /> [필수] 만 14세 미만 아동 수집 동의<br>
+
+
+      <input type="checkbox" v-model="user.maAgree" /> [선택] 마케팅 동의
+      <span @click="thirdtoggle" style="cursor:pointer;">
+        {{ thirdAgree ? '🔺' : '🔻' }}
+      </span><br>
+      <div v-if="thirdAgree" class="mt-2 ml-6 text-gray-700">
+        1. 수집이용목적<br>
+        1) 상품안내, 이벤트 행사 관련 정보 안내<br>
+        2. 수집 항목<br>
+        1) 휴대전화번호<br>
+        3. 보유 및 이용기간<br>
+        1) 회원탈퇴 또는 고객 삭제 요청시 까지
+      </div>
     </div>
+
     <button @click="submitUser" class="bg-blue-500 text-white px-4 py-2 rounded">가입</button>
-
-
 
   </div>
 
@@ -42,10 +70,24 @@ export default {
       users: [],
       password2: '',
       selectedUser: null,
-      agree: false
+      agree: false,
+
+      requiredAgree: false,
+      fourteenAgree: false,
+      thirdAgree: false
     };
   },
   methods: {
+    requiredtoggle() {
+      this.requiredAgree = !this.requiredAgree
+    },
+    fourteentoggle() {
+      this.fourteenAgree = !this.fourteenAgree
+    },
+    thirdtoggle() {
+      this.thirdAgree = !this.thirdAgree
+    },
+
     async submitUser() {
       // 모두 입력 했는지 확인
       if (!this.user.userId || !this.user.password || !this.password2 ||

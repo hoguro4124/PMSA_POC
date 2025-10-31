@@ -18,10 +18,8 @@ public class User {
     private String phone;
     @Column(name = "password")
     private String password;
-    @Column(name = "marketing_agree")
+    @Column(name = "ma_agree")
     private boolean maAgree;
-    @Column(name = "age_agree")
-    private boolean ageAgree;
     @Column(name = "name")
     private String name;
     @Column(name = "email")
@@ -51,11 +49,9 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+
     public boolean isMaAgree() { return maAgree; }
     public void setMaAgree(boolean maAgree) { this.maAgree = maAgree; }
-
-    public boolean isAgeAgree() { return ageAgree; }
-    public void setAgeAgree(boolean ageAgree) { this.ageAgree = ageAgree; }
 
     public int getAccessLevel() { return accessLevel; }
     public void setAccessLevel(int accessLevel) { this.accessLevel = accessLevel; }
@@ -69,7 +65,6 @@ public class User {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", maAgree=" + maAgree +
-                ", ageAgree=" + ageAgree +
                 ", accessLevel=" + accessLevel +
                 '}';
     }

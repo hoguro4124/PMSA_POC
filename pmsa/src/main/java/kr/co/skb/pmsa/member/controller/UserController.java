@@ -83,8 +83,8 @@ public class UserController {
             user.setName(updatedUser.getName());
             user.setPhone(updatedUser.getPhone());
             user.setEmail(updatedUser.getEmail());
-            user.setAgeAgree(updatedUser.isAgeAgree());
             user.setMaAgree(updatedUser.isMaAgree());
+            user.setAccessLevel(updatedUser.getAccessLevel());
             // 비밀번호가 null이 아니고 공백이 아닌 경우만 암호화 후 저장
             String pw = updatedUser.getPassword();
             if (pw != null && !pw.trim().isEmpty()) {

@@ -1,6 +1,6 @@
 <template>
     <div class="p-4">
-        <h1 class="text-2xl font-bold mb-4">최고관리자 - 관리자 목록</h1>
+        <h1 class="text-2xl font-bold mb-4">최고관리자 - 사용자 목록</h1>
 
         <!-- 검색창 -->
         <input v-model="searchInput" type="text" placeholder="이름, 전화번호, 이메일 검색" class="border p-2 w-full mr-2" />
@@ -29,9 +29,9 @@
                     </td>
                     <td class="border px-2 py-1" :key="user.id" @click="goToDetail(user.id)"> {{ user.userId }}</td>
                     <td class="border px-2 py-1"> {{ masKed ? maskName(user.name) : user.name }} </td>
-                    <td class="border px-2 py-1">{{ masKed ? maskPhone(user.phone) : user.phone }}</td>
-                    <td class="border px-2 py-1">{{ masKed ? maskEmail(user.email) : user.email }}</td>
-                    <td class="border px-2 py-1">{{ formatAccessLevel(user.accessLevel) }}</td>
+                    <td class="border px-2 py-1"> {{ user.phone }} </td>
+                    <td class="border px-2 py-1"> {{ masKed ? maskEmail(user.email) : user.email }} </td>
+                    <td class="border px-2 py-1">{{ formatAccessLevel(user.accessLevel) }} </td>
                 </tr>
             </tbody>
         </table>
@@ -87,7 +87,7 @@ export default {
                 .filter(user => user.accessLevel === 3)
                 .filter(user =>
                     user.name?.toLowerCase().includes(keyword) ||
-                    user.phone?.includes(keyword) ||
+                    //user.phone?.includes(keyword) ||
                     user.email?.toLowerCase().includes(keyword)
                 );
         },
@@ -151,10 +151,10 @@ export default {
             return name
         },
         // 전화번호 마스킹
-        maskPhone(phone) {
-            if (!phone || phone.length < 7) return phone
-            return phone.substring(0, 3) + '****' + phone.substring(phone.length - 4)
-        },
+        //maskPhone(phone) {
+        //if (!phone || phone.length < 7) return phone
+        // return phone.substring(0, 3) + '****' + phone.substring(phone.length - 4)
+        //},
         // 이메일 마스킹
         maskEmail(email) {
             if (!email.includes('@')) return email

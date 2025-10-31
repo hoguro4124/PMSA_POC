@@ -16,8 +16,9 @@
 
             <div class="mb-2">
                 <label class="font-semibold">전화번호: </label>
-                <span v-if="!editMode">{{ masKed ? maskPhone(user.phone) : user.phone }}</span>
-                <input v-else v-model="user.phone" class="border p-1 ml-2" />
+                <!-- <span v-if="!editMode">{{ masKed ? maskPhone(user.phone) : user.phone }}</span>
+                <input v-else v-model="user.phone" class="border p-1 ml-2" /> -->
+                <span>{{ user.phone }}</span>
             </div>
 
             <div class="mb-2">
@@ -27,13 +28,8 @@
             </div>
 
             <div class="mb-2">
-                <label class="font-semibold">개인정보 수집 동의: </label>
-                <span>{{ user.maagree ? '동의' : '미동의' }}</span>
-            </div>
-
-            <div class="mb-2">
-                <label class="font-semibold">14세 미만 동의: </label>
-                <span>{{ user.ageagree ? '동의' : '미동의' }}</span>
+                <label class="font-semibold">마케팅 미만 동의: </label>
+                <span>{{ user.maAgree ? '동의' : '미동의' }}</span>
             </div>
 
             <div class="mb-2">
@@ -90,6 +86,7 @@ export default {
         try {
             const response = await axios.get(`http://localhost:8080/users/${userId}`);
             this.user = response.data;
+            console.log(this.user)
         } catch (error) {
             alert('사용자 정보 로딩 실패: ' + error);
         }

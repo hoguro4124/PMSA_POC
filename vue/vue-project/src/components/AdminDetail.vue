@@ -2,13 +2,49 @@
     <div class="p-4">
         <h2 class="text-xl font-bold mb-4">사용자 상세 정보</h2>
 
+
         <div v-if="user">
-            <p><strong>ID:</strong> {{ user.userId }}</p>
-            <p><strong>이름:</strong> {{ masKed ? maskName(user.name) : user.name }}</p>
-            <p><strong>전화번호:</strong> {{ masKed ? maskPhone(user.phone) : user.phone }}</p>
-            <p><strong>이메일:</strong> {{ masKed ? maskEmail(user.email) : user.email }}</p>
-            <p><strong>권한:</strong> {{ formatAccessLevel(user.accessLevel) }}</p>
+            <div class="mb-2">
+                <label class="font-semibold">ID: </label>
+                <span>{{ user.userId }}</span>
+            </div>
+
+            <div class="mb-2">
+                <label class="font-semibold">이름: </label>
+                <span v-if="!editMode">{{ masKed ? maskName(user.name) : user.name }}</span>
+                <input v-else v-model="user.name" class="border p-1 ml-2" />
+            </div>
+
+            <div class="mb-2">
+                <label class="font-semibold">전화번호: </label>
+                <!-- <span v-if="!editMode">{{ masKed ? maskPhone(user.phone) : user.phone }}</span>
+                <input v-else v-model="user.phone" class="border p-1 ml-2" /> -->
+                <span>{{ user.phone }}</span>
+            </div>
+
+            <div class="mb-2">
+                <label class="font-semibold">이메일: </label>
+                <span v-if="!editMode">{{ masKed ? maskEmail(user.email) : user.email }}</span>
+                <input v-else v-model="user.email" class="border p-1 ml-2" />
+            </div>
+
+
+            <div class="mb-2">
+                <label class="font-semibold">권한: </label>
+
+                <span v-if="!editMode">
+                    {{ formatAccessLevel(user.accessLevel) }}
+                </span>
+
+                <select v-else v-model.number="user.accessLevel"
+                    @change="console.log('권한선택:', user.accessLevel, typeof user.accessLevel)" class="border p-2 ml-2">
+                    <option :value="1">최고관리자</option>
+                    <option :value="2">상담사</option>
+                </select>
+            </div>
+
         </div>
+
 
         <div v-else>
             <p>사용자 정보를 불러오는 중...</p>
@@ -19,8 +55,18 @@
             {{ masKed ? '마스킹 해제' : '마스킹 적용' }}
         </button>
 
+
+        <!-- 수정 모드 토글 -->
+        <button @click="editMode = !editMode" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">
+            {{ editMode ? '수정 취소' : '수정하기' }}
+        </button>
+
+        <!-- 수정 저장 버튼 -->
+        <button v-if="editMode" @click="updateUser" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
+            저장
+        </button>
         <!-- 삭제 버튼 -->
-        <button @click="deleteUser" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+        <button v-if="editMode" @click="deleteUser" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
             삭제
         </button>
 
@@ -34,7 +80,9 @@ export default {
         return {
             user: null,
             // 마스킹 적용/해제
-            masKed: true
+            masKed: true,
+            // 수정 
+            editMode: false
         }
     },
 
@@ -83,8 +131,20 @@ export default {
             const maskedUser = userPart[0] + '*'.repeat(Math.max(userPart.length - 1, 1))
             return maskedUser + '@' + domain
         },
+        // 수정 요청
+        async updateUser() {
+            const userId = this.$route.params.id;
+            try {
+                const response = await axios.put(`http://localhost:8080/users/${userId}`, this.user);
+                this.user = response.data;
+                alert('사용자 정보가 수정되었습니다.');
+                this.editMode = false;
+            } catch (error) {
+                alert('수정 실패: ' + error);
+            }
+        },
 
-
+        //삭제 요청
         async deleteUser() {
             console.log(this.user)
 

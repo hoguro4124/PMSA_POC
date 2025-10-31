@@ -1,14 +1,15 @@
 <template>
+    <!-- 상단 Navbar -->
     <nav class="bg-gray-800 text-white p-4 flex justify-between items-center">
         <div class="flex space-x-4">
             <router-link to="/" class="hover:underline">홈</router-link>
 
             <!-- 관리자 전용 메뉴 -->
-            <router-link v-if="accessLevel === 1" to="/admin-List" class="hover:underline">
+            <router-link v-if="accessLevel === 1" to="/Admin-List" class="hover:underline">
                 관리자 목록
             </router-link>
             <router-link v-if="accessLevel === 1" to="/User-List" class="hover:underline">
-                사용자 목록
+                고객 목록
             </router-link>
 
             <!-- 상담사 이상 접근 가능 -->
@@ -34,6 +35,7 @@
 
         </div>
     </nav>
+
 </template>
 
 <script setup>

@@ -7,12 +7,14 @@ import IdInquiry from '@/components/IdInquiry.vue'
 import AdminHome from '@/components/AdminHome.vue'
 import AdminList from '@/components/AdminList.vue'
 import AdminDetail from '@/components/AdminDetail.vue'
+import AdminJoin from '@/components/AdminJoin.vue'
 
 import UserList from '@/components/UserList.vue'
 import UserDetail from '@/components/UserDetail.vue'
 
 import UserHome from '@/components/UserHome.vue'
 import VocHome from '@/components/VocHome.vue'
+import Board from '@/components/Board.vue'
 
 import MyPage from '@/components/MyPage.vue'
 import MypageAuth from '@/components/MypageAuth.vue'
@@ -61,6 +63,12 @@ const router = createRouter({
       meta: { requiresAuth: true, accessLevel: 1 }
     },
     {
+      path: '/Admin-Join',
+      name: 'AdminJoin',
+      component: AdminJoin,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    {
       path: '/User-List',
       name: 'UserList',
       component: UserList,
@@ -83,6 +91,12 @@ const router = createRouter({
       path: '/User-Home',
       name: 'UserHome',
       component: UserHome,
+      meta: { requiresAuth: true, accessLevel: 3 }
+    },
+    {
+      path: '/Board',
+      name: 'Board',
+      component: Board,
       meta: { requiresAuth: true, accessLevel: 3 }
     },
     {

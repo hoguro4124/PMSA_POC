@@ -42,6 +42,11 @@
             선택 사용자 다운로드
         </button>
 
+        <!-- 사용자 등록 버튼 -->
+        <button @click="$router.push('/Admin-Join')" class="bg-green-500 text-white px-4 py-2 rounded mb-4">
+            관리자 생성
+        </button>
+
         <!-- 페이지네이션 -->
         <div class="flex justify-center mt-4 space-x-2">
             <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="[

@@ -3,81 +3,65 @@
         <h2 class="text-xl font-bold mb-4">사용자 상세 정보</h2>
 
         <div v-if="user">
-            <div class="mb-2">
-                <label class="font-semibold">ID: </label>
-                <span>{{ user.userId }}</span>
-            </div>
-
-
-            <div v-if="editMode" class="mb-2">
-                <label class="font-semibold">비밀번호: </label>
-                <input type="password" v-model="user.password" class="border p-1 ml-2" placeholder="새 비밀번호 입력" />
-            </div>
-
-            <div v-if="editMode" class="mb-2">
-                <label class="font-semibold">비밀번호 재입력: </label>
-
-                <input type="password" v-model="password2" class="border p-1 ml-2" placeholder="새 비밀번호 재입력" />
-            </div>
-
-
-
-
-
-            <div class="mb-2">
-                <label class="font-semibold">이름: </label>
-                <span v-if="!editMode">{{ user.name }}</span>
-                <input v-else v-model="user.name" class="border p-1 ml-2" />
-            </div>
-
-            <div class="mb-2">
-                <label class="font-semibold">전화번호: </label>
-                <span v-if="!editMode">{{ user.phone }}</span>
-                <input v-else v-model="user.phone" class="border p-1 ml-2" />
-            </div>
-
-            <div class="mb-2">
-                <label class="font-semibold">이메일: </label>
-                <span v-if="!editMode">{{ user.email }}</span>
-                <input v-else v-model="user.email" class="border p-1 ml-2" />
-            </div>
-            <div class="mb-2">
-                <label class="font-semibold">권한: </label>
-                <span>{{ formatAccessLevel(user.accessLevel) }}</span>
-            </div>
-
             <div>
-                <br>
-                <h3>동의</h3>
-            </div>
+                <div class="mb-2">
+                    <label class="font-semibold">ID: </label>
+                    <span>{{ user.userId }}</span>
+                </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">마케팅 수집 동의: </label>
-                <span v-if="!editMode">{{ user.maAgree ? '동의' : '미동의' }}</span>
+                <div v-if="editMode" class="mb-2">
+                    <label class="font-semibold">비밀번호: </label>
+                    <input type="password" v-model="user.password" class="border p-1 ml-2" placeholder="새 비밀번호 입력" />
+                </div>
 
-                <!-- 수정 모드일 때 스위치 보여줌 -->
-                <div v-else>
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" v-model="user.maAgree" class="sr-only peer" />
-                        <span class="ml-2 text-sm text-gray-700">
-                            {{ user.maAgree ? '동의함' : '미동의' }}
-                        </span>
-                    </label>
+                <div v-if="editMode" class="mb-2">
+                    <label class="font-semibold">비밀번호 재입력: </label>
+
+                    <input type="password" v-model="password2" class="border p-1 ml-2" placeholder="새 비밀번호 재입력" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="font-semibold">이름: </label>
+                    <span v-if="!editMode">{{ user.name }}</span>
+                    <input v-else v-model="user.name" class="border p-1 ml-2" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="font-semibold">전화번호: </label>
+                    <span v-if="!editMode">{{ user.phone }}</span>
+                    <input v-else v-model="user.phone" class="border p-1 ml-2" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="font-semibold">이메일: </label>
+                    <span v-if="!editMode">{{ user.email }}</span>
+                    <input v-else v-model="user.email" class="border p-1 ml-2" />
+                </div>
+                <div class="mb-2">
+                    <label class="font-semibold">권한: </label>
+                    <span>{{ formatAccessLevel(user.accessLevel) }}</span>
                 </div>
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">14세 미만 동의: </label>
-                <span v-if="!editMode">{{ user.ageAgree ? '동의' : '미동의' }}</span>
+            <div v-if="user.accessLevel == '3'">
+                <div>
+                    <br>
+                    <h3>동의</h3>
+                </div>
 
-                <!-- 수정 모드일 때 스위치 보여줌 -->
-                <div v-else>
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" v-model="user.ageAgree" class="sr-only peer" />
-                        <span class="ml-2 text-sm text-gray-700">
-                            {{ user.ageAgree ? '동의함' : '미동의' }}
-                        </span>
-                    </label>
+                <div class="mb-2">
+                    <label class="font-semibold">마케팅 동의: </label>
+                    <span v-if="!editMode">{{ user.maAgree ? '동의' : '미동의' }}</span>
+
+                    <!-- 수정 모드일 때 스위치 보여줌 -->
+                    <div v-else>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" v-model="user.maAgree" class="sr-only peer" />
+                            <span class="ml-2 text-sm text-gray-700">
+                                {{ user.maAgree ? '동의함' : '미동의' }}
+                            </span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -130,6 +114,7 @@ export default {
         try {
             const response = await axios.get(`http://localhost:8080/users/${userId}`);
             this.user = response.data;
+            console.log(this.user)
         } catch (error) {
             alert('사용자 정보 로딩 실패: ' + error);
         }
