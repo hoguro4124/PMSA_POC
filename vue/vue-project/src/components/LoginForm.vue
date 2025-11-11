@@ -1,24 +1,38 @@
 <template>
-  <div>
-    <h1> 로그인 </h1>
-  </div>
+  <main class="form-signin w-100 m-auto">
+    <h1 class="h3 mb-3 fw-normal text-center">로그인</h1>
 
-  <div>
-    <input v-model="user.userId" placeholder="ID" class="border p-2 mr-2" />
-    <br>
-    <input type="password" v-model="user.password" placeholder="비밀번호" class="border p-2" />
-    <br>
-    <button @click="submitLogin" class="bg-blue-500 text-white px-4 py-2 rounded">로그인</button>
-    <br>
-    <br>
-    <button @click="goToUserJoin" class="bg-blue-500 text-white px-4 py-2 rounded">회원가입</button>
-    <br>
-    <button @click="goToIdInquiry" class="bg-blue-500 text-white px-4 py-2 rounded">ID 찾기</button>
-  </div>
+    <form @submit.prevent="submitLogin">
+      <div class="form-floating mb-3">
+        <input v-model="user.userId" type="text" class="form-control" id="floatingUserId" placeholder="아이디" required />
+        <label for="floatingUserId">아이디</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input v-model="user.password" type="password" class="form-control" id="floatingPassword" placeholder="비밀번호"
+          required />
+        <label for="floatingPassword">비밀번호</label>
+      </div>
 
+      <button type="submit" class="w-100 btn btn-lg btn-primary">
+        로그인
+      </button>
 
+      <div class="d-flex justify-content-between mt-3">
+        <button type="button" class="btn btn-link p-0" @click="goToUserJoin">회원가입</button>
+        <button type="button" class="btn btn-link p-0" @click="goToIdInquiry">ID 찾기</button>
+      </div>
+    </form>
+  </main>
 </template>
+<style scoped>
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+  margin-top: 50px;
 
+}
+</style>
 <script setup>
 import { useRouter } from 'vue-router'
 

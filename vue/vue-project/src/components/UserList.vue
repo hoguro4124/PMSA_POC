@@ -1,58 +1,100 @@
 <template>
-    <div class="p-4">
-        <h1 class="text-2xl font-bold mb-4">최고관리자 - 사용자 목록</h1>
+    <main class="form-signin w-100 m-auto">
+        <h1 class="h3 mb-3 fw-normal text-center">최고관리자 - 사용자 목록</h1>
 
         <!-- 검색창 -->
-        <input v-model="searchInput" type="text" placeholder="이름, 전화번호, 이메일 검색" class="border p-2 w-full mr-2" />
-        <button @click="performSearch" class="bg-blue-500 text-white px-4 py-2 rounded">
-            검색
-        </button>
+        <form class="mb-3 d-flex" @submit.prevent="performSearch">
+            <input v-model="searchInput" type="text" class="form-control me-2 input-small"
+                placeholder="이름, 전화번호, 이메일 검색" />
+            <button type="submit" class="btn btn-primary btn-small">검색</button>
+        </form>
 
         <!-- 조회 목록 -->
-        <table class="table-auto w-full border-collapse border border-gray-400">
+        <table class="table table-bordered table-striped align-middle">
             <thead>
-                <tr class="bg-gray-200">
-                    <th class="border px-2 py-1">
-                        <input type="checkbox" v-model="selectAll" @change="toggleAll" />
-                    </th>
-                    <th class="border px-2 py-1">ID</th>
-                    <th class="border px-2 py-1">이름</th>
-                    <th class="border px-2 py-1">전화번호</th>
-                    <th class="border px-2 py-1">이메일</th>
-                    <th class="border px-2 py-1">권한</th>
+                <tr class="table-light">
+                    <th style="width: 20px;" class="text-center"> <input type="checkbox" v-model="selectAll"
+                            @change="toggleAll" /></th>
+                    <th style="width: 40px;" class="text-center">ID</th>
+                    <th style="width: 40px;" class="text-center">이름</th>
+                    <th style="width: 60px;" class="text-center">전화번호</th>
+                    <th style="width: 80px;" class="text-center">이메일</th>
+                    <th style="width: 40px;" class="text-center">권한</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="user in paginatedUsers" class="cursor-pointer hover:bg-gray-100">
-                    <td class="border px-2 py-1">
-                        <input type="checkbox" v-model="selectedUsers" :value="user" />
-                    </td>
-                    <td class="border px-2 py-1" :key="user.id" @click="goToDetail(user.id)"> {{ user.userId }}</td>
-                    <td class="border px-2 py-1"> {{ masKed ? maskName(user.name) : user.name }} </td>
-                    <td class="border px-2 py-1"> {{ user.phone }} </td>
-                    <td class="border px-2 py-1"> {{ masKed ? maskEmail(user.email) : user.email }} </td>
-                    <td class="border px-2 py-1">{{ formatAccessLevel(user.accessLevel) }} </td>
+                <tr v-for="user in paginatedUsers" :key="user.id" class="cursor-pointer" @click="goToDetail(user.id)">
+                    <td><input type="checkbox" v-model="selectedUsers" :value="user" @click.stop /></td>
+                    <td>{{ user.userId }}</td>
+                    <td>{{ masKed ? maskName(user.name) : user.name }}</td>
+                    <td>{{ masKed ? maskPhone(user.phone) : user.phone }}</td>
+                    <td>{{ masKed ? maskEmail(user.email) : user.email }}</td>
+                    <td>{{ formatAccessLevel(user.accessLevel) }}</td>
                 </tr>
             </tbody>
         </table>
 
         <!-- 다운로드 버튼 -->
-        <button @click="downloadCSV" class="bg-green-500 text-white px-4 py-2 rounded mb-4">
-            선택 사용자 다운로드
-        </button>
+        <div class="mb-3 d-flex gap-2">
+            <button @click="downloadCSV" class="btn btn-success">선택 사용자 다운로드</button>
+
+        </div>
 
         <!-- 페이지네이션 -->
-        <div class="flex justify-center mt-4 space-x-2">
-            <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="[
-                'px-3 py-1 border rounded',
-                currentPage === page ? 'bg-blue-500 text-white' : 'bg-white text-black'
-            ]">
-                {{ page }}
-            </button>
-        </div>
-    </div>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
+                    <button class="page-link" @click="currentPage = page">{{ page }}</button>
+                </li>
+            </ul>
+        </nav>
+    </main>
 </template>
 
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.cursor-pointer {
+    cursor: poin ter;
+}
+
+.input-small {
+    height: 30px;
+    /* 원하는 높이로 조절 */
+    padding: 0.25rem 0.5rem;
+    /* 상하/좌우 패딩 조절 */
+    font-size: 0.875rem;
+    /* 텍스트 크기 조절 */
+}
+
+.btn-small {
+    height: 30px;
+    /* 원하는 높이로 조절 */
+    padding: 0.25rem 0.5rem;
+    /* 상하/좌우 패딩 조절 */
+    font-size: 0.5rem;
+    /* 텍스트 크기 조절 */
+}
+
+.table {
+    width: 900px;
+    /* 표 전체 너비 고정 */
+    table-layout: fixed;
+    /* 고정 레이아웃 사용 */
+}
+
+.th,
+td {
+    text-align: center;
+}
+</style>
 
 <script>
 import axios from 'axios'
@@ -150,11 +192,11 @@ export default {
             if (name.length >= 3) return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
             return name
         },
-        // 전화번호 마스킹
-        //maskPhone(phone) {
-        //if (!phone || phone.length < 7) return phone
-        // return phone.substring(0, 3) + '****' + phone.substring(phone.length - 4)
-        //},
+        //전화번호 마스킹
+        maskPhone(phone) {
+            if (!phone || phone.length < 7) return phone
+            return phone.substring(0, 3) + '****' + phone.substring(phone.length - 4)
+        },
         // 이메일 마스킹
         maskEmail(email) {
             if (!email.includes('@')) return email

@@ -19,7 +19,7 @@ import Board from '@/components/Board.vue'
 import MyPage from '@/components/MyPage.vue'
 import MypageAuth from '@/components/MypageAuth.vue'
 
-
+import AccessLog from '@/views/AccessLog.vue'
 
 
 const router = createRouter({
@@ -108,6 +108,14 @@ const router = createRouter({
       path: '/Mypage-Auth',
       name: 'MypageAuth',
       component: MypageAuth,
+    },
+
+    //추가
+    {
+      path: '/access-logs',
+      name: 'AccessLog',
+      component: AccessLog,
+      meta: { requiresAuth: true, accessLevel: 1 }
     },
 
 

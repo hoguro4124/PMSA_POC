@@ -6,20 +6,25 @@ import NavbarBottom from './components/NavbarBottom.vue';
 </script>
 
 <template>
-
-  <div>
-    <Navbar />
-    <main class="min-h-[calc(100vh-34rem)] p-4">
+  <main class="min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="form-signin">
+      <Navbar />
       <Router-view />
-    </main>
-    <NavbarBottom />
-  </div>
+      <NavbarBottom />
+    </div>
+  </main>
 </template>
 
 <style scoped>
+.form-signin {
+  max-width: auto;
+  width: 100%;
+  margin: auto;
+}
+
 main {
-  min-height: calc(100vh - 34rem);
-  padding-bottom: 4rem;
-  /* 하단 네브바 높이 확보 */
+  padding: 1rem;
+  background-color: #f0f2f5;
+  min-height: 100vh;
 }
 </style>

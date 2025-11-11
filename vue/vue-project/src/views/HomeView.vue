@@ -24,14 +24,20 @@ onMounted(() => {
 <template>
   <main>
     <div>
-      <h1>개인정보처리시스템 진단 역량강화 POC 홈페이지</h1>
+      <h1 class="text-center">개인정보처리시스템 진단 역량강화 POC 홈페이지</h1>
       <br>
-      <br>
-      <br>
-      <h1>개인정보취급방침</h1>
     </div>
     <div>
       <LoginForm />
     </div>
   </main>
 </template>
+
+<style scoped>
+/* 부트스트랩 기본 스타일이 적용되므로 추가 커스터마이징은 선택 */
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+</style>

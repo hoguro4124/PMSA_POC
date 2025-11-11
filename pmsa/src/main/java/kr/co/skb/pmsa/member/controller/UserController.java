@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+// [추가] AccessLogService import
+import kr.co.skb.pmsa.member.service.AccessLogService;
+// [추가] IP 주소를 얻기 위한 import
+import jakarta.servlet.http.HttpServletRequest;
 
 
 
@@ -29,6 +33,11 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    // [추가] AccessLogService 주입
+    @Autowired
+    private AccessLogService accessLogService;
+
 
     // 모든 사용자 조회
     @GetMapping //조회 (HTTP GET)
@@ -96,7 +105,10 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+    //public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+    // HttpServletRequest를 파라미터로 받음
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData, HttpServletRequest request) {
+
 
         String userId = loginData.get("userId");
         String password = loginData.get("password");
@@ -106,6 +118,13 @@ public class UserController {
 
         Optional<User> user = userRepository.findByuserIdAndPassword(userId, hashedPassword);
         if (user.isPresent()) {
+            // 1. 접속 IP 주소 획득
+            String ipAddress = request.getRemoteAddr();
+
+            // 2. [핵심] Access Log 기록 저장
+            accessLogService.saveLog(userId, ipAddress, "LOGIN");
+
+
             String token = jwtUtil.generateToken(userId, user.get().getAccessLevel());
 
             Map<String, Object> response = new HashMap<>();
