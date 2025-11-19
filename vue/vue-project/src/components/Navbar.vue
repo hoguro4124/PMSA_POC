@@ -18,6 +18,9 @@
                     <li class="nav-item" v-if="accessLevel === 1">
                         <router-link class="nav-link" to="/User-List">고객 목록</router-link>
                     </li>
+                    <li class="nav-item" v-if="accessLevel === 1">
+                        <router-link class="nav-link" to="/Access-Logs">접속 기록</router-link>
+                    </li>
                     <!-- 상담사 이상 접근 가능 -->
                     <li class="nav-item" v-if="accessLevel === 2">
                         <router-link class="nav-link" to="/voc-home">VOC 페이지</router-link>

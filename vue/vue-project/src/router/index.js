@@ -19,7 +19,7 @@ import Board from '@/components/Board.vue'
 import MyPage from '@/components/MyPage.vue'
 import MypageAuth from '@/components/MypageAuth.vue'
 
-import AccessLog from '@/views/AccessLog.vue'
+import AccessLog from '@/components/AccessLog.vue'
 
 
 const router = createRouter({

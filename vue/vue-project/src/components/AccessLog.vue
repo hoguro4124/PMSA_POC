@@ -4,12 +4,38 @@
             접속 기록 관리 (Access Logs)
         </h1>
 
+        <!-- 검색 필터 영역 -->
+        <div class="bg-white shadow rounded-lg p-5 mb-6 border-l-4 border-blue-400">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <div class="flex flex-col">
+                    <label for="searchId" class="text-sm font-medium text-gray-700 mb-1">사용자 ID 검색</label>
+                    <input type="text" id="searchId" v-model="searchUserId" placeholder="검색할 사용자 ID 입력"
+                        class="border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="actionType" class="text-sm font-medium text-gray-700 mb-1">작업 유형</label>
+                    <select id="actionType" v-model="searchActionType"
+                        class="border border-gray-300 p-2 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500">
+                        <option v-for="type in actionTypes" :key="type.value" :value="type.value">
+                            {{ type.text }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="flex items-end h-full pt-4 md:pt-0">
+                    <button @click="resetSearch"
+                        class="w-full bg-gray-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-600 transition duration-150 shadow-md">
+                        검색 초기화
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div v-if="loading" class="text-center py-10">
             <p class="text-lg text-blue-600">데이터를 불러오는 중입니다...</p>
-            <!-- 로딩 스피너 -->
-            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mt-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mt-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
@@ -24,8 +50,8 @@
         </div>
 
         <div v-else class="bg-white shadow-xl rounded-lg overflow-hidden">
-            <div v-if="logs.length === 0" class="p-6 text-center text-gray-500">
-                접속 기록이 존재하지 않습니다.
+            <div v-if="filteredLogs.length === 0" class="p-6 text-center text-gray-500">
+                {{ logs.length > 0 ? '검색 조건과 일치하는 기록이 없습니다.' : '접속 기록이 존재하지 않습니다.' }}
             </div>
 
             <table v-else class="min-w-full divide-y divide-gray-200">
@@ -49,8 +75,9 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(log, index) in logs" :key="log.id" :class="{ 'bg-gray-50': index % 2 === 1 }">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ log.id }}</td>
+                    <tr v-for="(log, index) in filteredLogs" :key="log.id" :class="{ 'bg-gray-50': index % 2 === 1 }">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ filteredLogs.length - index }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{{ log.userId }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span :class="getActionClass(log.actionType)">
@@ -64,16 +91,14 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-import dayjs from 'dayjs'; // 날짜/시간 포맷팅을 위해 dayjs 라이브러리 사용 가정
-
-// 한국어 로케일이 필요하다면 아래 주석 해제 (프로젝트에 dayjs가 설치되어 있어야 함)
+import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
+
 dayjs.locale('ko');
 
 export default {
@@ -82,49 +107,67 @@ export default {
             logs: [],
             loading: false,
             error: null,
-            // API 기본 경로 설정 (백엔드 포트에 맞게 수정하세요)
             API_BASE_URL: 'http://localhost:8080/api/access-logs',
+
+            searchUserId: '',
+            searchActionType: 'ALL',
+            actionTypes: [
+                { value: 'ALL', text: '전체' },
+                { value: 'LOGIN', text: '일반 로그인' },
+                { value: 'ADMIN_LOGIN', text: '관리자 로그인' },
+                { value: 'LOGOUT', text: '로그아웃' },
+            ]
         };
+    },
+    computed: {
+        filteredLogs() {
+            let filtered = this.logs;
+
+            if (this.searchUserId) {
+                const lowerCaseSearch = this.searchUserId.toLowerCase();
+                filtered = filtered.filter(log =>
+                    log.userId.toLowerCase().includes(lowerCaseSearch)
+                );
+            }
+
+            if (this.searchActionType && this.searchActionType !== 'ALL') {
+                filtered = filtered.filter(log =>
+                    log.actionType === this.searchActionType
+                );
+            }
+
+            return filtered;
+        }
     },
     mounted() {
         this.fetchAccessLogs();
     },
     methods: {
-        // 접속 기록 데이터를 백엔드로부터 가져오는 함수
         async fetchAccessLogs() {
             this.loading = true;
             this.error = null;
             try {
                 const response = await axios.get(this.API_BASE_URL);
-                // API에서 최신순으로 정렬되어 오므로 그대로 사용
                 this.logs = response.data;
             } catch (err) {
                 console.error("접속 기록 조회 오류:", err);
-                this.error = '접속 기록을 불러오는 데 실패했습니다.';
+                this.error = '접속 기록을 불러오는 데 실패했습니다. 서버 상태와 API 경로를 확인하세요.';
             } finally {
                 this.loading = false;
             }
         },
-
-        // 날짜/시간 포맷팅 함수
+        resetSearch() {
+            this.searchUserId = '';
+            this.searchActionType = 'ALL';
+        },
         formatDateTime(dateTime) {
             if (!dateTime) return 'N/A';
-            // 'YYYY-MM-DDTHH:mm:ss.SSS' 형태의 문자열을 포맷팅
-            // Dayjs 라이브러리가 필요합니다. (npm install dayjs)
-            return dayjs(dateTime).format('YYYY-MM-DD HH:mm:ss');
+            return dayjs(dateTime).format('YYYY년 MM월 DD일 HH:mm');
         },
-
-        // 작업 유형을 사용자에게 친숙한 이름으로 변환
         getActionDisplay(actionType) {
-            switch (actionType) {
-                case 'LOGIN': return '일반 로그인';
-                case 'ADMIN_LOGIN': return '관리자 로그인';
-                case 'LOGOUT': return '로그아웃';
-                default: return actionType;
-            }
+            const found = this.actionTypes.find(type => type.value === actionType);
+            return found ? found.text : actionType;
         },
-
-        // 작업 유형에 따라 스타일 클래스 지정
         getActionClass(actionType) {
             switch (actionType) {
                 case 'LOGIN': return 'inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800';
@@ -138,5 +181,5 @@ export default {
 </script>
 
 <style scoped>
-/* Tailwind CSS 사용으로 별도의 style은 최소화 */
-</style>3
+/* Tailwind CSS 사용 */
+</style>

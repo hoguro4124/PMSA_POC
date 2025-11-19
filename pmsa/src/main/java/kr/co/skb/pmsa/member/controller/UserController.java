@@ -44,6 +44,7 @@ public class UserController {
     public List<User> getAllUsers() {
         System.out.println("[User] GetMapping Call");
         return userRepository.findAll();
+
     }
     
     // ID로 특정 사용자 조회

@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+
+// JwtParser 임포트 추가
+import io.jsonwebtoken.JwtParser;
+
 @Component
 public class JwtUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // 안전한 256비트 키 생성
