@@ -1,3 +1,4 @@
+
 package kr.co.skb.pmsa.member.repository;
 
 import kr.co.skb.pmsa.member.entity.AccessLog;
@@ -18,8 +19,7 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
      * JpaRepository가 메서드 이름을 분석하여 쿼리를 자동으로 생성합니다.
      * @return 최신 접속 기록 목록
      */
-    List<AccessLog> findAllByOrderByLogTimeDesc();
+    List<AccessLog> findAllByOrderByLogTimeDesc();}
 
-    // 추가적인 조회 기능이 필요하다면 여기에 정의할 수 있습니다.
-    // 예: List<AccessLog> findByUserIdOrderByLogTimeDesc(String userId);
-}
+// 추가적인 조회 기능이 필요하다면 여기에 정의할 수 있습니다.
+// 예

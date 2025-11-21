@@ -3,6 +3,9 @@
         <div class="container-fluid">
 
             <router-link class="navbar-brand" to="/">홈</router-link>
+
+            <span class="badge bg-secondary ms-2">Level: {{ accessLevel }}</span>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -11,63 +14,86 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <!-- 관리자 전용 메뉴 -->
-                    <li class="nav-item" v-if="accessLevel === 1">
-                        <router-link class="nav-link" to="/Admin-List">관리자 목록</router-link>
-                    </li>
-                    <li class="nav-item" v-if="accessLevel === 1">
-                        <router-link class="nav-link" to="/User-List">고객 목록</router-link>
-                    </li>
-                    <li class="nav-item" v-if="accessLevel === 1">
-                        <router-link class="nav-link" to="/Access-Logs">접속 기록</router-link>
-                    </li>
-                    <!-- 상담사 이상 접근 가능 -->
+
+                    <template v-if="accessLevel === 1">
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/Admin-List">관리자 목록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/User-List">고객 목록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/Access-Logs">접속 기록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/work-logs">작업 기록</router-link>
+                        </li>
+                    </template>
+
                     <li class="nav-item" v-if="accessLevel === 2">
                         <router-link class="nav-link" to="/voc-home">VOC 페이지</router-link>
                     </li>
-                    <!-- 사용자 접근 가능 -->
+
                     <li class="nav-item" v-if="accessLevel === 3">
                         <router-link class="nav-link" to="/user-home">사용자 페이지</router-link>
                     </li>
-                    <!-- 마이 페이지 -->
-                    <li class="nav-item" v-if="isLoggedIn">
-                        <router-link class="nav-link" to="/mypage-auth">마이페이지</router-link>
-                    </li>
-                    <!-- 로그아웃 -->
-                    <li class="nav-item" v-if="isLoggedIn">
-                        <button @click="logout" class="btn btn-danger ms-2">로그아웃</button>
-                    </li>
+
+                    <template v-if="isLoggedIn">
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/mypage-auth">마이페이지</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <button @click="logout" class="btn btn-danger ms-2">로그아웃</button>
+                        </li>
+                    </template>
                 </ul>
             </div>
         </div>
     </nav>
 </template>
 
-
-
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const router = useRouter()
 
+// 상태 변수 선언
 const token = ref(localStorage.getItem('token'))
-const accessLevel = ref(parseInt(localStorage.getItem('accessLevel')) || 99) // 99 = 비로그인 사용자
+const accessLevel = ref(99) // 기본값 비로그인
 
 const isLoggedIn = computed(() => !!token.value)
 
-const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('accessLevel')
-    token.value = null
-    accessLevel.value = 99
-    router.push('/')
+// [핵심] 권한 상태를 강제로 업데이트하는 함수
+const checkAuthStatus = () => {
+    const storedToken = localStorage.getItem('token')
+    const storedLevel = localStorage.getItem('accessLevel')
+
+    token.value = storedToken
+    // 숫자로 변환하여 저장 (없으면 99)
+    accessLevel.value = storedLevel ? parseInt(storedLevel) : 99
 }
 
+let intervalId = null;
 
+onMounted(() => {
+    checkAuthStatus(); // 1. 켜지자마자 확인
 
+    // 2. 0.5초마다 계속 확인 (반응성 강제 적용)
+    intervalId = setInterval(checkAuthStatus, 500);
+})
 
+onUnmounted(() => {
+    if (intervalId) clearInterval(intervalId);
+})
 
+const logout = () => {
+    localStorage.clear();
+    checkAuthStatus();
+    router.push('/');
+    // 확실한 초기화를 위해 새로고침
+    setTimeout(() => window.location.reload(), 100);
+}
 </script>
 
 <style scoped>

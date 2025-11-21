@@ -47,6 +47,7 @@ const goToIdInquiry = () => {
 
 <script>
 import axios from 'axios'
+
 export default {
   data() {
     return {
@@ -54,55 +55,55 @@ export default {
         userId: '',
         password: '',
       },
-      users: [],
     };
   },
   methods: {
+    goToUserJoin() {
+      this.$router.push('/user-join');
+    },
+    goToIdInquiry() {
+      this.$router.push('/Id-Inquiry');
+    },
     async submitLogin() {
-      // 모두 입력 했는지 확인
       if (!this.user.userId || !this.user.password) {
         alert('모든 입력값을 입력해주세요.');
         return;
       }
 
       try {
-        // 성공 시 로그인 수행
         const response = await axios.post('http://localhost:8080/users/login', this.user);
 
         const userData = response.data.user;
         const token = response.data.token;
-        console.log(JSON.stringify(userData))
+        const accessLevel = parseInt(userData.accessLevel);
 
-        // 토큰과 권한을 localStorage에 저장
+        // 1. 정보 저장
         localStorage.setItem('token', token);
-        localStorage.setItem('accessLevel', userData.accessLevel);
-        localStorage.setItem('user', userData.id);
+        localStorage.setItem('accessLevel', accessLevel);
+        localStorage.setItem('user', JSON.stringify(userData.id));
         localStorage.setItem('userId', userData.userId);
 
-
-
-
-        console.log("입력값 : ", this.user)
-        console.log("회신값 : ", response.data.user)
-        console.log("토큰 : ", response.data.token)
         alert('로그인 성공');
-        this.users.push(response.data);
-        window.location.reload();
 
+        // ▼▼▼ [핵심 수정] 메뉴가 바로 뜨도록 '강제 새로고침 이동' 사용 ▼▼▼
+        // router.push 대신 location.href를 쓰면 페이지가 완전히 새로 로딩되면서
+        // Navbar도 '어? 로그인됐네?' 하고 메뉴를 다시 그립니다.
 
-        if (response.data.user.accessLevel === 1) {
-          this.$router.push('/Admin-Home');
-        } else if (response.data.user.accessLevel === 2) {
-          this.$router.push('/Voc-Home');
-        } else if (response.data.user.accessLevel === 3) {
-          this.$router.push('/User-Home');
+        if (accessLevel === 1) {
+          window.location.href = '/Admin-Home';
+        } else if (accessLevel === 2) {
+          window.location.href = '/Voc-Home';
+        } else if (accessLevel === 3) {
+          window.location.href = '/User-Home';
         } else {
-          console.log('오류');
+          window.location.href = '/';
         }
+        // ▲▲▲ [수정 끝] ▲▲▲
 
       } catch (error) {
-        // 오류
-        alert('로그인 실패: ' + error);
+        console.error(error);
+        const msg = error.response?.data || '로그인 실패';
+        alert(msg);
       }
     }
   }

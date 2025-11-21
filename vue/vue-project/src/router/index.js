@@ -20,7 +20,7 @@ import MyPage from '@/components/MyPage.vue'
 import MypageAuth from '@/components/MypageAuth.vue'
 
 import AccessLog from '@/components/AccessLog.vue'
-
+import WorkLog from '@/components/WorkLog.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -117,6 +117,12 @@ const router = createRouter({
       component: AccessLog,
       meta: { requiresAuth: true, accessLevel: 1 }
     },
+    {
+      path: '/work-logs',
+      name: 'WorkLog',
+      component: WorkLog,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
 
 
     {
@@ -150,14 +156,14 @@ router.beforeEach((to, from, next) => {
     }
 
     const requiredLevel = to.meta.accessLevel || 3;
-    if (accessLevel != requiredLevel) {
-      alert('접근 권한이 없습니다.');
-      if (accessLevel == 1)
-        return next('/AdminHome');
-      else if (accessLevel == 2)
-        return next('/VocHome');
-      else if (accessLevel == 1)
-        return next('/UserHome');
+    if (accessLevel > requiredLevel) {
+      alert(`접근 권한이 없습니다. (필요 레벨: ${requiredLevel}, 현재 레벨: ${accessLevel})`);
+
+      if (accessLevel <= 1) return next('/Admin-Home');
+      else if (accessLevel === 2) return next('/Voc-Home');
+      else if (accessLevel === 3) return next('/User-Home');
+
+      return next('/');
     }
   }
 

@@ -1,8 +1,6 @@
-
 package kr.co.skb.pmsa.member.controller;
 
-import kr.co.skb.pmsa.member.entity.AccessLog;
-import kr.co.skb.pmsa.member.service.AccessLogService;
+import kr.co.skb.pmsa.member.entity.WorkLog;
 import kr.co.skb.pmsa.member.service.WorkLogService;
 import kr.co.skb.pmsa.member.util.JwtUtil;
 
@@ -10,15 +8,13 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/access-logs")
-public class AccessLogController {
-
-    @Autowired
-    private AccessLogService accessLogService;
+@RequestMapping("/api/work-logs")
+public class WorkLogController {
 
     @Autowired
     private WorkLogService workLogService;
@@ -48,8 +44,8 @@ public class AccessLogController {
     }
 
     @GetMapping
-    public List<AccessLog> getAllAccessLogs(
-            @RequestParam(required = false) String searchUserId,
+    public List<WorkLog> getAllWorkLogs(
+            @RequestParam(required = false) String searchOperatorId,
             @RequestParam(required = false) String actionType,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
@@ -58,29 +54,25 @@ public class AccessLogController {
         String operatorId = getOperatorId(request);
         String ip = getClientIp(request);
 
-        // 디버깅용 로그
-        System.out.println(">>> [AccessLog] 검색 요청: ID=" + searchUserId + ", Type=" + actionType);
+        System.out.println(">>> [WorkLog] 검색 요청: ID=" + searchOperatorId + ", Type=" + actionType);
 
-        // 검색 조건이 하나라도 존재하는지 체크
-        boolean isSearch = (searchUserId != null && !searchUserId.trim().isEmpty()) ||
+        boolean isSearch = (searchOperatorId != null && !searchOperatorId.trim().isEmpty()) ||
                 (actionType != null && !"ALL".equals(actionType)) ||
                 (startDate != null && !startDate.isEmpty()) ||
                 (endDate != null && !endDate.isEmpty());
 
         if (isSearch) {
-            // [검색 로그 저장]
-            String details = String.format("검색 조건 [ID: %s, 유형: %s, 기간: %s~%s]",
-                    (searchUserId == null || searchUserId.isEmpty()) ? "-" : searchUserId,
+            String details = String.format("검색 조건 [작업자: %s, 유형: %s, 기간: %s~%s]",
+                    (searchOperatorId == null || searchOperatorId.isEmpty()) ? "-" : searchOperatorId,
                     (actionType == null || "ALL".equals(actionType)) ? "-" : actionType,
                     (startDate == null || startDate.isEmpty()) ? "-" : startDate,
                     (endDate == null || endDate.isEmpty()) ? "-" : endDate);
 
-            workLogService.saveWorkLog(operatorId, "ALL", "접속 기록", "ACCESS_LOG_SEARCH", details, ip);
+            workLogService.saveWorkLog(operatorId, "ALL", "작업 기록", "WORK_LOG_SEARCH", details, ip);
         } else {
-            // [전체 조회 로그 저장]
-            workLogService.saveWorkLog(operatorId, "ALL", "접속 기록", "ACCESS_LOG_VIEW", "접속 이력 전체 조회", ip);
+            workLogService.saveWorkLog(operatorId, "ALL", "작업 기록", "WORK_LOG_VIEW", "작업 이력 전체 조회", ip);
         }
 
-        return accessLogService.getAllLogs();
+        return workLogService.getAllLogs();
     }
 }
