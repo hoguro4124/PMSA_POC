@@ -1,11 +1,11 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h1 class="h3 mb-3 fw-normal text-center">최고관리자 - 사용자 목록</h1>
+        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">최고관리자 - 사용자 목록</h1>
 
         <div class="mb-3 d-flex">
-            <input v-model="searchInput" @keyup.enter="getUsers" type="text" class="form-control me-2 input-small"
+            <input v-model="searchInput" @keyup.enter="searchUsers" type="text" class="form-control me-2 input-small"
                 placeholder="이름, 전화번호, 이메일 검색" />
-            <button @click="getUsers" class="btn btn-primary btn-small">검색</button>
+            <button @click="searchUsers" class="btn btn-primary btn-small">검색</button>
         </div>
 
         <table class="table table-bordered table-striped align-middle">
@@ -27,9 +27,10 @@
                     <td>{{ masKed ? maskName(user.name) : user.name }}</td>
                     <td>{{ masKed ? maskPhone(user.phone) : user.phone }}</td>
                     <td>{{ masKed ? maskEmail(user.email) : user.email }}</td>
+
                     <td>{{ formatAccessLevel(user.accessLevel) }}</td>
                 </tr>
-                <tr v-if="users.length === 0">
+                <tr v-if="filteredUsers.length === 0">
                     <td colspan="6" class="text-center py-4 text-muted">
                         {{ loading ? '로딩중...' : '데이터가 없습니다.' }}
                     </td>
@@ -74,7 +75,8 @@
 .btn-small {
     height: 30px;
     padding: 0.25rem 0.5rem;
-    font-size: 0.5rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
 }
 
 .table {
@@ -105,30 +107,39 @@ export default {
         }
     },
     computed: {
-        // 프론트엔드 필터링 로직 제거
-        totalPages() {
-            return Math.ceil(this.users.length / this.pageSize);
+        // [핵심 수정] 여기서 레벨 3(일반 사용자)만 확실하게 남깁니다.
+        filteredUsers() {
+            return this.users.filter(user => user.accessLevel === 3);
         },
+
+        // 필터링된 목록을 기준으로 페이지 계산
+        totalPages() {
+            if (this.filteredUsers.length === 0) return 1;
+            return Math.ceil(this.filteredUsers.length / this.pageSize);
+        },
+        // 필터링된 목록을 기준으로 데이터 자르기
         paginatedUsers() {
             const start = (this.currentPage - 1) * this.pageSize;
-            return this.users.slice(start, start + this.pageSize);
+            return this.filteredUsers.slice(start, start + this.pageSize);
         }
     },
     methods: {
-        // [수정] 서버로 검색어 전송
-        async getUsers() {
+        searchUsers() {
+            this.getUsers(this.searchInput);
+        },
+
+        async getUsers(keyword = null) {
             this.loading = true;
             try {
                 const token = localStorage.getItem('token');
-
-                // 검색어 파라미터 구성
                 const params = {};
-                if (this.searchInput) {
-                    params.keyword = this.searchInput;
+                if (keyword) {
+                    params.keyword = keyword;
                 }
 
                 console.log(">>> [UserList] 서버 요청:", params);
 
+                // /users API는 전체 목록을 주지만, computed에서 3번만 거름
                 const response = await axios.get('http://localhost:8080/users', {
                     headers: { 'Authorization': `Bearer ${token}` },
                     params: params
@@ -139,7 +150,7 @@ export default {
 
             } catch (error) {
                 console.error(error);
-                alert('조회 실패: ' + error);
+                alert('조회 실패: ' + error.message);
             } finally {
                 this.loading = false;
             }

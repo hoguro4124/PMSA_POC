@@ -1,19 +1,17 @@
 <template>
-    <div class="p-8 bg-gray-50 min-h-screen">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">
-            개인정보취급자 작업 기록 (Work Logs)
-        </h1>
+    <main class="form-signin w-100 m-auto">
+        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">개인정보취급자 작업 기록</h1>
 
-        <div class="bg-white shadow rounded-lg p-5 mb-6 border-l-4 border-indigo-500">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">작업자 ID</label>
-                    <input type="text" v-model="inputOperatorId" @keyup.enter="applySearch" placeholder="작업자 ID"
-                        class="border border-gray-300 p-2 rounded-md" />
+        <div class="mb-4 p-3 bg-white rounded border border-primary">
+            <form @submit.prevent="applySearch" class="row g-3 align-items-end">
+                <div class="col-6 col-md-2">
+                    <label class="form-label">작업자 ID</label>
+                    <input type="text" v-model="inputOperatorId" class="form-control form-control-sm"
+                        placeholder="작업자 ID" />
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">작업 유형</label>
-                    <select v-model="inputActionType" class="border border-gray-300 p-2 rounded-md bg-white">
+                <div class="col-6 col-md-2">
+                    <label class="form-label">작업 유형</label>
+                    <select v-model="inputActionType" class="form-select form-select-sm">
                         <option value="ALL">전체</option>
                         <option value="USER_LIST_VIEW">목록 조회</option>
                         <option value="USER_DETAIL_VIEW">상세 조회</option>
@@ -24,59 +22,88 @@
                         <option value="USER_SEARCH">고객 검색</option>
                     </select>
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">시작일</label>
-                    <input type="date" v-model="inputStartDate" class="border border-gray-300 p-2 rounded-md" />
+                <div class="col-6 col-md-2">
+                    <label class="form-label">시작일</label>
+                    <input type="date" v-model="inputStartDate" class="form-control form-control-sm" />
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">종료일</label>
-                    <input type="date" v-model="inputEndDate" class="border border-gray-300 p-2 rounded-md" />
+                <div class="col-6 col-md-2">
+                    <label class="form-label">종료일</label>
+                    <input type="date" v-model="inputEndDate" class="form-control form-control-sm" />
                 </div>
-                <div class="flex gap-2 h-full">
-                    <button @click="applySearch"
-                        class="flex-1 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700 h-[42px] self-end">검색</button>
-                    <button @click="resetSearch"
-                        class="flex-1 bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 h-[42px] self-end">초기화</button>
+                <div class="col-12 col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-fill">검색</button>
+                    <button type="button" @click="resetSearch" class="btn btn-secondary btn-sm flex-fill">초기화</button>
                 </div>
-            </div>
+            </form>
         </div>
 
-        <div v-if="loading" class="text-center py-10">
-            <p class="text-lg text-indigo-600">로딩중...</p>
+        <div v-if="loading" class="text-center py-5">
         </div>
+
 
         <div v-else class="bg-white shadow-xl rounded-lg overflow-hidden overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">NO</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">작업자</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">메뉴명</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">유형</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">대상자</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">상세 내용</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">IP</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">일시</th>
+            <table class="table table-bordered table-striped align-middle">
+                <thead>
+                    <tr class="table-light">
+                        <th style="width: 40px;" class="text-center">NO</th>
+                        <th style="width: 80px;" class="text-center">작업자</th>
+                        <th style="width: 120px;" class="text-center">메뉴명</th>
+
+                        <th style="width: 80px;" class="text-center">대상자</th>
+                        <th style="width: 160px;" class="text-center">상세 내용</th>
+                        <th style="width: 120px;" class="text-center">IP</th>
+                        <th style="width: 180px;" class="text-center">일시</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(log, index) in filteredLogs" :key="log.id" class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-500">{{ filteredLogs.length - index }}</td>
-                        <td class="px-4 py-3 text-sm font-bold text-indigo-600">{{ log.operatorId }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700">{{ log.menuName || '-' }}</td>
-                        <td class="px-4 py-3 text-sm"><span :class="getActionClass(log.actionType)">{{ log.actionType
-                                }}</span></td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ log.targetId || '-' }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate" :title="log.details">{{
+                <tbody>
+                    <tr v-for="(log, index) in paginatedUsers" :key="log.id">
+                        <td>{{ filteredLogs.length - index }}</td>
+                        <td>{{ log.operatorId }}</td>
+                        <td>{{ log.menuName || '-' }}</td>
+                        <td>{{ log.targetId || '-' }}</td>
+                        <td :title="log.details">{{
                             log.details }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-500">{{ log.ipAddress }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-500">{{ formatDateTime(log.logTime) }}</td>
+                        <td>{{ log.ipAddress }}</td>
+                        <td>{{ formatDateTime(log.logTime) }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </div>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
+                    <button class="page-link" @click="currentPage = page">{{ page }}</button>
+                </li>
+            </ul>
+        </nav>
+    </main>
 </template>
+
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.table {
+    width: 900px;
+    table-layout: fixed;
+}
+
+.table td {
+    text-align: center;
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
 
 <script>
 import axios from 'axios';
@@ -87,7 +114,8 @@ export default {
         return {
             logs: [],
             loading: false,
-
+            currentPage: 1,
+            pageSize: 100,
             inputOperatorId: '', inputActionType: 'ALL', inputStartDate: '', inputEndDate: '',
             searchOperatorId: '', searchActionType: 'ALL', searchStartDate: '', searchEndDate: ''
         }
@@ -100,6 +128,16 @@ export default {
             if (this.searchStartDate) filtered = filtered.filter(l => dayjs(l.logTime).isAfter(dayjs(this.searchStartDate).startOf('day')) || dayjs(l.logTime).isSame(dayjs(this.searchStartDate).startOf('day')));
             if (this.searchEndDate) filtered = filtered.filter(l => dayjs(l.logTime).isBefore(dayjs(this.searchEndDate).endOf('day')) || dayjs(l.logTime).isSame(dayjs(this.searchEndDate).endOf('day')));
             return filtered;
+        },
+        // 필터링된 목록을 기준으로 페이지 계산
+        totalPages() {
+            if (this.filteredLogs.length === 0) return 1;
+            return Math.ceil(this.filteredLogs.length / this.pageSize);
+        },
+        // 필터링된 목록을 기준으로 데이터 자르기
+        paginatedUsers() {
+            const start = (this.currentPage - 1) * this.pageSize;
+            return this.filteredLogs.slice(start, start + this.pageSize);
         }
     },
     mounted() {
@@ -109,8 +147,9 @@ export default {
         async fetchLogs(params = {}) {
             this.loading = true;
             try {
-                const response = await axios.get('http://localhost:8080/api/work-logs', { params });
+                const response = await axios.get('http://localhost:8080/work_logs', { params });
                 this.logs = response.data;
+                this.currentPage = 1;
             } catch (error) {
                 console.error(error);
             } finally {
@@ -141,13 +180,6 @@ export default {
         formatDateTime(time) {
             return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
         },
-        getActionClass(type) {
-            if (type.includes('SEARCH')) return 'text-purple-600 font-bold'; // 검색은 보라색
-            if (type.includes('VIEW')) return 'text-blue-600 font-bold';
-            if (type.includes('UPDATE')) return 'text-orange-600 font-bold';
-            if (type.includes('DELETE')) return 'text-red-600 font-bold';
-            return 'text-gray-600';
-        }
     }
 }
 </script>

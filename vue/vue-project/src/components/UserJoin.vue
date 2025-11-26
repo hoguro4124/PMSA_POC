@@ -1,55 +1,104 @@
 <template>
-  <div>
-    <h1> 회원가입 </h1>
-  </div>
-  <div class="p-4">
-    <h2 class="text-xl font-bold mb-4">회원 가입</h2>
-    <div class="mb-4">
-      * <input v-model="user.userId" placeholder="ID" class="border p-2 mr-2" /><br>
-      * <input type="password" v-model="user.password" placeholder="비밀번호" class="border p-2 mr-2" /><br>
-      * <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="border p-2 mr-2" /><br>
-      * <input v-model="user.name" placeholder="이름" class="border p-2 mr-2" /><br>
-      * <input v-model="user.phone" placeholder="전화번호" class="border p-2 mr-2" /><br>
-      * <input v-model="user.email" placeholder="이메일" class="border p-2 mr-2" /><br>
-
-      <input type="checkbox" v-model="agree" /> [필수] 개인정보 수집 동의
-      <span @click="requiredtoggle" style="cursor:pointer;">
-        {{ requiredAgree ? '🔺' : '🔻' }}
-      </span><br>
-      <div v-if="requiredAgree" class="mt-2 ml-6 text-gray-700">
-        1. 개인정보 수집 목적<br>
-        1) 회원 관리<br>
-        이용자 식별 및 본인 확인, 가입의사 확인, 불만처리 등 민원처리, 공지사항 전달, 불량회원 부정이용 방지<br>
-        2) 서비스 이용 및 요금 정산<br>
-        광고상품의 청약, 요금 결제, SMS 발신번호 등록/관리<br>
-        2. 개인정보 수집 항목<br>
-        이름, ID, 비밀번호, 이메일<br>
-        3. 개인정보 보유 및 이용 기간<br>
-        회원 탈퇴 시 지체없이 파기(관련 법령의 규정에 의하여 보존할 필요가 있는 경우에는 해당 기간까지 보관 후 파기)
+  <main class="form-signin w-100 m-auto">
+    <h2 class="h3 fw-bold mb-4 text-center">회원 가입</h2>
+    <form @submit.prevent="submitUser" class="mb-4">
+      <div class="mb-3">
+        <input v-model="user.userId" placeholder="ID" class="form-control input-small" />
+      </div>
+      <div class="mb-3">
+        <input type="password" v-model="user.password" placeholder="비밀번호" class="form-control input-small" />
+      </div>
+      <div class="mb-3">
+        <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="form-control input-small" />
+      </div>
+      <div class="mb-3">
+        <input v-model="user.name" placeholder="이름" class="form-control input-small" />
+      </div>
+      <div class="mb-3">
+        <input v-model="user.phone" placeholder="전화번호" class="form-control input-small" />
+      </div>
+      <div class="mb-3">
+        <input v-model="user.email" placeholder="이메일" class="form-control input-small" />
       </div>
 
-      <input type="checkbox" v-model="user.ageAgree" /> [필수] 만 14세 미만 아동 수집 동의<br>
-
-
-      <input type="checkbox" v-model="user.maAgree" /> [선택] 마케팅 동의
-      <span @click="thirdtoggle" style="cursor:pointer;">
-        {{ thirdAgree ? '🔺' : '🔻' }}
-      </span><br>
-      <div v-if="thirdAgree" class="mt-2 ml-6 text-gray-700">
-        1. 수집이용목적<br>
-        1) 상품안내, 이벤트 행사 관련 정보 안내<br>
-        2. 수집 항목<br>
-        1) 휴대전화번호<br>
-        3. 보유 및 이용기간<br>
-        1) 회원탈퇴 또는 고객 삭제 요청시 까지
+      <div class="form-check mb-2">
+        <input type="checkbox" v-model="agree" id="agreePrivacy" class="form-check-input" />
+        <label for="agreePrivacy" class="form-check-label fw-semibold">
+          [필수] 개인정보 수집 동의
+          <span @click="requiredtoggle" style="cursor:pointer;">
+            {{ requiredAgree ? '🔺' : '🔻' }}
+          </span>
+        </label>
+        <div v-if="requiredAgree" class="ms-3 mt-2 text-secondary small">
+          1. 개인정보 수집 목적<br />
+          1) 회원 관리<br />
+          이용자 식별 및 본인 확인, 가입의사 확인, 불만처리 등 민원처리, 공지사항 전달, 불량회원 부정이용 방지<br />
+          2) 서비스 이용 및 요금 정산<br />
+          광고상품의 청약, 요금 결제, SMS 발신번호 등록/관리<br />
+          2. 개인정보 수집 항목<br />
+          이름, ID, 비밀번호, 이메일<br />
+          3. 개인정보 보유 및 이용 기간<br />
+          회원 탈퇴 시 지체없이 파기(관련 법령의 규정에 의하여 보존할 필요가 있는 경우에는 해당 기간까지 보관 후 파기)
+        </div>
       </div>
-    </div>
 
-    <button @click="submitUser" class="bg-blue-500 text-white px-4 py-2 rounded">가입</button>
+      <div class="form-check mb-2">
+        <input type="checkbox" v-model="user.ageAgree" id="agreeAge" class="form-check-input" />
+        <label for="agreeAge" class="form-check-label fw-semibold">
+          [필수] 만 14세 미만 아동 수집 동의
+        </label>
+      </div>
 
-  </div>
+      <div class="form-check mb-2">
+        <input type="checkbox" v-model="user.maAgree" id="agreeMarketing" class="form-check-input" />
+        <label for="agreeMarketing" class="form-check-label fw-semibold">
+          [선택] 마케팅 동의
+          <span @click="thirdtoggle" style="cursor:pointer;">
+            {{ thirdAgree ? '🔺' : '🔻' }}
+          </span>
+        </label>
+        <div v-if="thirdAgree" class="ms-3 mt-2 text-secondary small">
+          1. 수집이용목적<br />
+          1) 상품안내, 이벤트 행사 관련 정보 안내<br />
+          2. 수집 항목<br />
+          1) 휴대전화번호<br />
+          3. 보유 및 이용기간<br />
+          1) 회원탈퇴 또는 고객 삭제 요청시 까지
+        </div>
+      </div>
 
+      <button type="submit" class="btn btn-primary btn-small w-100 mt-3">
+        가입
+      </button>
+    </form>
+  </main>
 </template>
+
+<style scoped>
+.form-signin {
+  max-width: 950px;
+  padding: 2rem;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #eee;
+}
+
+.input-small {
+  height: 38px;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 6px;
+}
+
+.btn-small {
+  height: 38px;
+  padding: 0 12px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+</style>
+
 
 <script>
 import axios from 'axios';

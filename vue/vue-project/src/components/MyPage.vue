@@ -1,97 +1,100 @@
 <template>
-    <div class="p-4">
-        <h2 class="text-xl font-bold mb-4">사용자 상세 정보</h2>
+    <main class="form-signin w-100 m-auto">
+        <h2 class="hh3 mb-3 fw-normal text-center border-bottom pb-2">사용자 상세 정보</h2>
 
-        <div v-if="user">
+        <div v-if="user" class="d-flex flex-column gap-3"
+            style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
             <div>
-                <div class="mb-2">
-                    <label class="font-semibold">ID: </label>
-                    <span>{{ user.userId }}</span>
-                </div>
+                <label class="form-label fw-semibold">ID:</label>
+                <div class="border rounded p-2 text-muted">{{ user.userId }}</div>
+            </div>
 
-                <div v-if="editMode" class="mb-2">
-                    <label class="font-semibold">비밀번호: </label>
-                    <input type="password" v-model="user.password" class="border p-1 ml-2" placeholder="새 비밀번호 입력" />
-                </div>
+            <div v-if="editMode">
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">비밀번호:</label>
+                <input type="password" v-model="user.password" class="form-control" placeholder="새 비밀번호 입력" />
+            </div>
 
-                <div v-if="editMode" class="mb-2">
-                    <label class="font-semibold">비밀번호 재입력: </label>
+            <div v-if="editMode">
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">비밀번호 재입력:</label>
+                <input type="password" v-model="password2" class="form-control" placeholder="새 비밀번호 재입력" />
+            </div>
 
-                    <input type="password" v-model="password2" class="border p-1 ml-2" placeholder="새 비밀번호 재입력" />
-                </div>
+            <div>
+                <label class="form-label fw-semibold " :class="{ 'text-danger': editMode }">이름:</label>
+                <div v-if="!editMode" class="border rounded p-2">{{ user.name }}</div>
+                <input v-else v-model="user.name" class="form-control" />
+            </div>
 
-                <div class="mb-2">
-                    <label class="font-semibold">이름: </label>
-                    <span v-if="!editMode">{{ user.name }}</span>
-                    <input v-else v-model="user.name" class="border p-1 ml-2" />
-                </div>
+            <div>
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">전화번호:</label>
+                <div v-if="!editMode" class="border rounded p-2">{{ user.phone }}</div>
+                <input v-else v-model="user.phone" class="form-control" />
+            </div>
 
-                <div class="mb-2">
-                    <label class="font-semibold">전화번호: </label>
-                    <span v-if="!editMode">{{ user.phone }}</span>
-                    <input v-else v-model="user.phone" class="border p-1 ml-2" />
+            <div>
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">이메일:</label>
+                <div v-if="!editMode" class="border rounded p-2">{{ user.email }}
                 </div>
+                <input v-else v-model="user.email" class="form-control" />
+            </div>
 
-                <div class="mb-2">
-                    <label class="font-semibold">이메일: </label>
-                    <span v-if="!editMode">{{ user.email }}</span>
-                    <input v-else v-model="user.email" class="border p-1 ml-2" />
-                </div>
-                <div class="mb-2">
-                    <label class="font-semibold">권한: </label>
-                    <span>{{ formatAccessLevel(user.accessLevel) }}</span>
-                </div>
+            <div>
+                <label class="form-label fw-semibold">권한:</label>
+                <div class="border rounded p-2 text-muted">{{ formatAccessLevel(user.accessLevel) }}</div>
             </div>
 
             <div v-if="user.accessLevel == '3'">
-                <div>
-                    <br>
-                    <h3>동의</h3>
-                </div>
-
-                <div class="mb-2">
-                    <label class="font-semibold">마케팅 동의: </label>
-                    <span v-if="!editMode">{{ user.maAgree ? '동의' : '미동의' }}</span>
-
-                    <!-- 수정 모드일 때 스위치 보여줌 -->
-                    <div v-else>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" v-model="user.maAgree" class="sr-only peer" />
-                            <span class="ml-2 text-sm text-gray-700">
-                                {{ user.maAgree ? '동의함' : '미동의' }}
-                            </span>
-                        </label>
-                    </div>
-                </div>
+                <h3>마케팅 동의</h3>
+                <label class="form-check-label d-flex align-items-center">
+                    <input type="checkbox" v-model="user.maAgree" class="form-check-input me-2" :disabled="!editMode" />
+                    <span>{{ user.maAgree ? '동의함' : '미동의' }}</span>
+                </label>
             </div>
-
-
-
         </div>
 
         <div v-else>
             <p>사용자 정보를 불러오는 중...</p>
         </div>
 
+        <div class="d-flex gap-2 mt-4">
+            <button @click="deleteUser" class="btn btn-danger flex-fill">
+                탈퇴
+            </button>
 
-        <!-- 탈퇴 버튼 -->
-        <button @click="deleteUser" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-            탈퇴
-        </button>
+            <button @click="toggleEditMode" class="btn btn-warning text-white flex-fill">
+                {{ editMode ? '수정 취소' : '수정하기' }}
+            </button>
 
-
-        <!-- 수정 모드 버튼 -->
-        <button @click="toggleEditMode" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">
-            {{ editMode ? '수정 취소' : '수정하기' }}
-        </button>
-
-        <!-- 수정 저장 버튼 -->
-        <button v-if="editMode" @click="updateUser" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-            저장
-        </button>
-
-    </div>
+            <button v-if="editMode" @click="updateUser" class="btn btn-primary flex-fill">
+                저장
+            </button>
+        </div>
+    </main>
 </template>
+
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.input-small {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+.btn {
+    min-width: 100px;
+}
+</style>
+
+
 
 <script>
 import axios from 'axios'

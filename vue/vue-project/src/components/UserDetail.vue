@@ -1,70 +1,95 @@
 <template>
-    <div class="p-4">
-        <h2 class="text-xl font-bold mb-4">사용자 상세 정보</h2>
+    <main class="form-signin w-100 m-auto">
+        <h2 class="h3 fw-bold mb-4 text-start">사용자 상세 정보</h2>
 
-        <div v-if="user">
-            <div class="mb-2">
-                <label class="font-semibold">ID: </label>
-                <span>{{ user.userId }}</span>
+        <div v-if="user" class="d-flex flex-column gap-3"
+            style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <div>
+                <label class="form-label fw-semibold">ID:</label>
+                <div class="border rounded p-2 text-muted">{{ user.userId }}</div>
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">이름: </label>
-                <span v-if="!editMode">{{ masKed ? maskName(user.name) : user.name }}</span>
-                <input v-else v-model="user.name" class="border p-1 ml-2" />
+            <div>
+                <label class="form-label fw-semibold">이름:</label>
+                <span v-if="!editMode" class="d-block">
+                    {{ masKed ? maskName(user.name) : user.name }}
+                </span>
+                <input v-else v-model="user.name" class="form-control input-small" />
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">전화번호: </label>
-                <!-- <span v-if="!editMode">{{ masKed ? maskPhone(user.phone) : user.phone }}</span>
-                <input v-else v-model="user.phone" class="border p-1 ml-2" /> -->
-                <span>{{ user.phone }}</span>
+            <div>
+                <label class="form-label fw-semibold">전화번호:</label>
+                <span class="d-block">{{ user.phone }}</span>
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">이메일: </label>
-                <span v-if="!editMode">{{ masKed ? maskEmail(user.email) : user.email }}</span>
-                <input v-else v-model="user.email" class="border p-1 ml-2" />
+            <div>
+                <label class="form-label fw-semibold">이메일:</label>
+                <span v-if="!editMode" class="d-block">
+                    {{ masKed ? maskEmail(user.email) : user.email }}
+                </span>
+                <input v-else v-model="user.email" class="form-control input-small" />
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">마케팅 미만 동의: </label>
-                <span>{{ user.maAgree ? '동의' : '미동의' }}</span>
+            <div>
+                <label class="form-label fw-semibold">마케팅 미만 동의:</label>
+                <span class="d-block">{{ user.maAgree ? '동의' : '미동의' }}</span>
             </div>
 
-            <div class="mb-2">
-                <label class="font-semibold">권한: </label>
-                <span>{{ formatAccessLevel(user.accessLevel) }}</span>
+            <div>
+                <label class="form-label fw-semibold">권한:</label>
+                <span class="d-block">{{ formatAccessLevel(user.accessLevel) }}</span>
             </div>
-
         </div>
 
         <div v-else>
             <p>사용자 정보를 불러오는 중...</p>
         </div>
 
-        <!-- 마스킹 적용/해제 버튼 -->
-        <button @click="toggleMask" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-            {{ masKed ? '마스킹 해제' : '마스킹 적용' }}
-        </button>
+        <div class="d-flex gap-2 mt-4 flex-wrap">
+            <button @click="toggleMask" class="btn btn-primary btn-small flex-fill">
+                {{ masKed ? '마스킹 해제' : '마스킹 적용' }}
+            </button>
 
-        <!-- 삭제 버튼 -->
-        <button @click="deleteUser" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-            삭제
-        </button>
+            <button @click="deleteUser" class="btn btn-primary btn-small flex-fill">
+                삭제
+            </button>
 
-        <!-- 수정 모드 토글 -->
-        <button @click="editMode = !editMode" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">
-            {{ editMode ? '수정 취소' : '수정하기' }}
-        </button>
+            <button @click="editMode = !editMode" class="btn btn-warning btn-small flex-fill">
+                {{ editMode ? '수정 취소' : '수정하기' }}
+            </button>
 
-        <!-- 수정 저장 버튼 -->
-        <button v-if="editMode" @click="updateUser" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-            저장
-        </button>
-
-    </div>
+            <button v-if="editMode" @click="updateUser" class="btn btn-primary btn-small flex-fill">
+                저장
+            </button>
+        </div>
+    </main>
 </template>
+
+<style scoped>
+.form-signin {
+    max-width: 480px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.input-small {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+.btn-small {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+</style>
+
 
 <script>
 import axios from 'axios'

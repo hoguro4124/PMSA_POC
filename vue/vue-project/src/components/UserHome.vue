@@ -1,14 +1,26 @@
-<template>
-    <h1>고객 로그인</h1>
+<script>
 
-    <button @click="goToBoard" class="bg-blue-500 text-white px-4 py-2 rounded">게시글 작성</button>
+</script>
+
+
+<template>
+    <main class="form-signin w-100 m-auto">
+        <h1 class="h3 mb-3 fw-normal text-center">UserHome</h1>
+
+
+    </main>
+
 </template>
 
-<script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
 
-const goToBoard = () => {
-    router.push('/Board')
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+
 }
-</script>
+</style>

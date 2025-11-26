@@ -1,13 +1,38 @@
 <template>
-    <div class="p-6 max-w-md mx-auto">
-        <h2 class="text-xl font-bold mb-4">비밀번호 재확인</h2>
-        <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="border p-2 w-full mb-4" />
-        <button @click="verifyPassword" class="bg-blue-500 text-white px-4 py-2 rounded">
+    <main class="form-signin w-100 m-auto">
+        <h2 class="h3 fw-bold mb-4 text-center">비밀번호 재확인</h2>
+        <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="form-control input-small mb-3" />
+        <button @click="verifyPassword" class="btn btn-primary btn-small w-100">
             확인
         </button>
-        <p v-if="error" class="text-red-500 mt-2">{{ error }}</p>
-    </div>
+        <p v-if="error" class="text-danger mt-3 text-center">{{ error }}</p>
+    </main>
 </template>
+
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.input-small {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+.btn-small {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+</style>
 
 <script>
 import axios from 'axios'

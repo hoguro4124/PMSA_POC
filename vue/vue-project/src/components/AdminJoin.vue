@@ -1,29 +1,53 @@
 <template>
-    <div class="p-4">
-        <h2 class="text-xl font-bold mb-4">관리자 계정 생성</h2>
+    <main class="form-signin w-100 m-auto">
+        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">관리자 계정 생성</h1>
 
         <div class="mb-4">
-            * <input v-model="user.userId" placeholder="ID" class="border p-2 mr-2" /><br>
-            * <input type="password" v-model="user.password" placeholder="비밀번호" class="border p-2 mr-2" /><br>
-            * <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="border p-2 mr-2" /><br>
-            * <input v-model="user.name" placeholder="이름" class="border p-2 mr-2" /><br>
-            * <input v-model="user.phone" placeholder="전화번호" class="border p-2 mr-2" /><br>
-            * <input v-model="user.email" placeholder="이메일" class="border p-2 mr-2" /><br>
-            *
-            <select v-model="user.accessLevel" class="border p-2 mr-2">
+            <input v-model="user.userId" placeholder="ID" class="form-control input-small mb-3" />
+            <input type="password" v-model="user.password" placeholder="비밀번호" class="form-control input-small mb-3" />
+            <input type="password" v-model="password2" placeholder="비밀번호 재입력" class="form-control input-small mb-3" />
+            <input v-model="user.name" placeholder="이름" class="form-control input-small mb-3" />
+            <input v-model="user.phone" placeholder="전화번호" class="form-control input-small mb-3" />
+            <input v-model="user.email" placeholder="이메일" class="form-control input-small mb-3" />
+            <select v-model="user.accessLevel" class="form-select input-small mb-3">
                 <option value="1">최고관리자</option>
                 <option value="2">상담사</option>
             </select>
-            <br>
         </div>
 
-        <!-- 생성  버튼 -->
-        <button @click="submitUser" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
+        <!-- 저장 버튼 -->
+        <button @click="submitUser" class="btn btn-primary btn-small">
             저장
         </button>
-
-    </div>
+    </main>
 </template>
+
+<style scoped>
+.form-signin {
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.input-small {
+    height: 38px;
+    /* bootstrap form-control 높이에 맞춤 */
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+.btn-small {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+</style>
+
 
 <script>
 import axios from 'axios';

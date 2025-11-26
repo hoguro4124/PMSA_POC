@@ -19,11 +19,12 @@
 
       <div class="d-flex justify-content-between mt-3">
         <button type="button" class="btn btn-link p-0" @click="goToUserJoin">회원가입</button>
-        <button type="button" class="btn btn-link p-0" @click="goToIdInquiry">ID 찾기</button>
+
       </div>
     </form>
   </main>
 </template>
+
 <style scoped>
 .form-signin {
   max-width: 330px;

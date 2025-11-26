@@ -22,6 +22,12 @@ import MypageAuth from '@/components/MypageAuth.vue'
 import AccessLog from '@/components/AccessLog.vue'
 import WorkLog from '@/components/WorkLog.vue'
 
+import BoardDetail from '@/components/BoardDetail.vue'
+import BoardList from '@/components/BoardList.vue'
+
+import AdList from '@/components/AdList.vue'
+import AdRegi from '@/components/AdRegi.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -93,12 +99,7 @@ const router = createRouter({
       component: UserHome,
       meta: { requiresAuth: true, accessLevel: 3 }
     },
-    {
-      path: '/Board',
-      name: 'Board',
-      component: Board,
-      meta: { requiresAuth: true, accessLevel: 3 }
-    },
+
     {
       path: '/My/:id',
       name: 'MyPage',
@@ -124,7 +125,38 @@ const router = createRouter({
       meta: { requiresAuth: true, accessLevel: 1 }
     },
 
+    // Board 관련
+    {//3
+      path: '/Board',
+      name: 'Board',
+      component: Board,
+      meta: { requiresAuth: true, accessLevel: 3 }
 
+    },
+    { //1, 2 
+      path: '/BoardList',
+      name: 'BoardList',
+      component: BoardList,
+      meta: { requiresAuth: true, accessLevels: [1, 2] }
+    },
+    {//1, 2
+      path: '/Board/:id',
+      name: 'BoardDetail',
+      component: BoardDetail,
+      props: true  // params를 props로 전달
+    },
+    {//3
+      path: '/AdRegi',
+      name: 'AdRegi',
+      component: AdRegi,
+      meta: { requiresAuth: true, accessLevel: 3 }
+    },
+    {//1,2
+      path: '/AdList',
+      name: 'AdList',
+      component: AdList,
+      meta: { requiresAuth: true, accessLevels: [1, 2] }
+    },
     {
       path: '/about',
       name: 'about',

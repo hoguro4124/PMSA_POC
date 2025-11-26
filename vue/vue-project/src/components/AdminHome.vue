@@ -15,10 +15,11 @@
 
 <style scoped>
 .form-signin {
-    max-width: 330px;
-    padding: 15px;
-    margin: auto;
-    margin-top: 50px;
-
+    max-width: 950px;
+    padding: 2rem;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #eee;
 }
 </style>

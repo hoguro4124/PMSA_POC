@@ -1,15 +1,14 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h1 class="h3 mb-3 fw-normal text-center">최고관리자 - 관리자 목록</h1>
+        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">최고관리자 - 관리자 목록</h1>
 
-        <!-- 검색창 -->
-        <form class="mb-3 d-flex" @submit.prevent="performSearch">
-            <input v-model="searchInput" type="text" class="form-control me-2 input-small"
+        <div class="mb-3 d-flex">
+            <input v-model="searchInput" @keyup.enter="searchUsers" type="text" class="form-control me-2 input-small"
                 placeholder="이름, 전화번호, 이메일 검색" />
-            <button type="submit" class="btn btn-primary btn-small">검색</button>
-        </form>
+            <button @click="searchUsers" class="btn btn-primary btn-small">검색</button>
+        </div>
 
-        <!-- 조회 목록 -->
+
         <table class="table table-bordered table-striped align-middle">
             <thead>
                 <tr class="table-light">
@@ -22,6 +21,7 @@
                     <th style="width: 40px;" class="text-center">권한</th>
                 </tr>
             </thead>
+
             <tbody>
                 <tr v-for="user in paginatedUsers" :key="user.id" class="cursor-pointer" @click="goToDetail(user.id)">
                     <td>
@@ -33,21 +33,20 @@
                     <td>{{ masKed ? maskEmail(user.email) : user.email }}</td>
                     <td>{{ formatAccessLevel(user.accessLevel) }}</td>
                 </tr>
-                <tr v-if="users.length === 0">
+                <tr v-if="filteredUsers.length === 0">
                     <td colspan="6" class="text-center py-4 text-muted">
                         {{ loading ? '로딩중...' : '데이터가 없습니다.' }}
                     </td>
                 </tr>
             </tbody>
+
         </table>
 
-        <!-- 하단 버튼 -->
         <div class="mb-3 d-flex gap-2">
             <button @click="downloadCSV" class="btn btn-success">선택 사용자 다운로드</button>
             <button @click="$router.push('/Admin-Join')" class="btn btn-success">관리자 생성</button>
         </div>
 
-        <!-- 페이지네이션 -->
         <nav>
             <ul class="pagination justify-content-center">
                 <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
@@ -74,27 +73,21 @@
 
 .input-small {
     height: 30px;
-    /* 원하는 높이로 조절 */
     padding: 0.25rem 0.5rem;
-    /* 상하/좌우 패딩 조절 */
     font-size: 0.875rem;
-    /* 텍스트 크기 조절 */
+
 }
 
 .btn-small {
     height: 30px;
-    /* 원하는 높이로 조절 */
     padding: 0.25rem 0.5rem;
-    /* 상하/좌우 패딩 조절 */
-    font-size: 0.5rem;
-    /* 텍스트 크기 조절 */
+    font-size: 0.7rem;
+    white-space: nowrap;
 }
 
 .table {
     width: 900px;
-    /* 표 전체 너비 고정 */
     table-layout: fixed;
-    /* 고정 레이아웃 사용 */
 }
 
 .th,
@@ -120,13 +113,20 @@ export default {
         }
     },
     computed: {
-        totalPages() {
-            if (this.users.length === 0) return 1;
-            return Math.ceil(this.users.length / this.pageSize);
+        // [핵심 수정] 레벨 3(일반 사용자)은 제외하고 1, 2만 보여줌
+        filteredUsers() {
+            return this.users.filter(user => user.accessLevel < 3);
         },
+
+        // 필터링된 목록 기준으로 페이지 계산
+        totalPages() {
+            if (this.filteredUsers.length === 0) return 1;
+            return Math.ceil(this.filteredUsers.length / this.pageSize);
+        },
+        // 필터링된 목록 기준으로 데이터 자르기
         paginatedUsers() {
             const start = (this.currentPage - 1) * this.pageSize;
-            return this.users.slice(start, start + this.pageSize);
+            return this.filteredUsers.slice(start, start + this.pageSize);
         }
     },
     methods: {
@@ -143,9 +143,8 @@ export default {
                     params.keyword = keyword;
                 }
 
-                // [수정] 모든 권한 조회를 위해 '/users' API 호출 (기존: /users/admins)
-                // /users/admins 는 관리자만 주지만, /users 는 전체를 줍니다.
-                // UserController.java 의 getAllUsers() 메서드를 활용합니다.
+                // 전체 목록을 가져와서 프론트에서 필터링 (관리자 목록이지만 검색 등을 위해 전체 호출 후 필터링이 안전할 수 있음)
+                // 또는 백엔드에서 /users/admins API를 쓰면 더 좋음 (하지만 현재 로직 유지를 위해 /users 사용)
                 const response = await axios.get('http://localhost:8080/users', {
                     headers: { 'Authorization': `Bearer ${token}` },
                     params: params
@@ -170,12 +169,7 @@ export default {
                 default: return '알 수 없음';
             }
         },
-        // [추가] 권한별 뱃지 색상 (보기 좋게)
-        getBadgeClass(level) {
-            if (level === 1) return 'badge bg-danger'; // 빨강 (최고관리자)
-            if (level === 2) return 'badge bg-warning text-dark'; // 노랑 (상담사)
-            return 'badge bg-secondary'; // 회색 (일반)
-        },
+
         goToDetail(id) { this.$router.push(`/Admin/${id}`); },
         toggleAll() {
             if (this.selectAll) { this.selectedUsers = [...this.paginatedUsers]; }

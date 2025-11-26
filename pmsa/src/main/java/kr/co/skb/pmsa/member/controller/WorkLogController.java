@@ -13,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/work-logs")
+@RequestMapping("work_logs")
 public class WorkLogController {
 
     @Autowired

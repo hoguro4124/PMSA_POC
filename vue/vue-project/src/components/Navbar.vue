@@ -1,10 +1,7 @@
 <template>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="custom-navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
 
-            <router-link class="navbar-brand" to="/">홈</router-link>
-
-            <span class="badge bg-secondary ms-2">Level: {{ accessLevel }}</span>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -14,7 +11,16 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <router-link class="nav-link" to="/">홈</router-link>
+                    </li>
 
+                    <li class="nav-item" v-if="accessLevel === 1 || accessLevel === 2">
+                        <router-link class="nav-link" to="/AdList">광고 목록</router-link>
+                    </li>
+                    <li class="nav-item" v-if="accessLevel === 1 || accessLevel === 2">
+                        <router-link class="nav-link" to="/BoardList">문의 사항 목록</router-link>
+                    </li>
                     <template v-if="accessLevel === 1">
                         <li class="nav-item">
                             <router-link class="nav-link" to="/Admin-List">관리자 목록</router-link>
@@ -34,23 +40,64 @@
                         <router-link class="nav-link" to="/voc-home">VOC 페이지</router-link>
                     </li>
 
+
+
                     <li class="nav-item" v-if="accessLevel === 3">
-                        <router-link class="nav-link" to="/user-home">사용자 페이지</router-link>
+                        <router-link class="nav-link" to="/AdRegi">광고 등록</router-link>
                     </li>
+                    <li class="nav-item" v-if="accessLevel === 3">
+                        <router-link class="nav-link" to="/board">문의 사항 등록</router-link>
+                    </li>
+
+
 
                     <template v-if="isLoggedIn">
                         <li class="nav-item">
                             <router-link class="nav-link" to="/mypage-auth">마이페이지</router-link>
                         </li>
                         <li class="nav-item">
-                            <button @click="logout" class="btn btn-danger ms-2">로그아웃</button>
+                            <router-link to="#" class="nav-link text-danger fw-bold" @click.prevent="logout"
+                                style="cursor: pointer;">
+                                로그아웃
+                            </router-link>
                         </li>
+
+
+
                     </template>
                 </ul>
             </div>
         </div>
     </nav>
 </template>
+
+<style scoped>
+.custom-navbar {
+    max-width: 950px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    border-radius: 12px;
+    /* 둥글기 조절 (원하는 px값으로 변경 가능) */
+}
+
+.custom-navbar .navbar-nav .nav-link {
+    padding-left: 1rem;
+    /* 기본값보다 더 넉넉한 좌측 패딩 */
+    padding-right: 1rem;
+    /* 기본값보다 더 넉넉한 우측 패딩 */
+}
+
+.custom-navbar .navbar-brand {
+    margin-right: 2rem;
+    /* 홈 메뉴와 이후 메뉴 사이의 좌측 여백 */
+}
+
+.custom-navbar {
+    margin-bottom: 2rem;
+    /* 원하는 여백 크기 조절 */
+}
+</style>
 
 <script setup>
 import { useRouter } from 'vue-router'
@@ -95,9 +142,3 @@ const logout = () => {
     setTimeout(() => window.location.reload(), 100);
 }
 </script>
-
-<style scoped>
-nav a {
-    margin-right: 1rem;
-}
-</style>
