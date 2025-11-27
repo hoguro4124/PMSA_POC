@@ -1,4 +1,3 @@
-
 package kr.co.skb.pmsa.member.controller;
 
 import kr.co.skb.pmsa.member.entity.AccessLog;
@@ -58,17 +57,14 @@ public class AccessLogController {
         String operatorId = getOperatorId(request);
         String ip = getClientIp(request);
 
-        // 디버깅용 로그
-        System.out.println(">>> [AccessLog] 검색 요청: ID=" + searchUserId + ", Type=" + actionType);
-
-        // 검색 조건이 하나라도 존재하는지 체크
-        boolean isSearch = (searchUserId != null && !searchUserId.trim().isEmpty()) ||
+        // [수정] 검색 조건이 진짜로 입력되었는지 체크
+        boolean hasSearchCondition = (searchUserId != null && !searchUserId.trim().isEmpty()) ||
                 (actionType != null && !"ALL".equals(actionType)) ||
                 (startDate != null && !startDate.isEmpty()) ||
                 (endDate != null && !endDate.isEmpty());
 
-        if (isSearch) {
-            // [검색 로그 저장]
+        if (hasSearchCondition) {
+            // 1. 검색 조건이 있을 때 -> "검색" 로그
             String details = String.format("검색 조건 [ID: %s, 유형: %s, 기간: %s~%s]",
                     (searchUserId == null || searchUserId.isEmpty()) ? "-" : searchUserId,
                     (actionType == null || "ALL".equals(actionType)) ? "-" : actionType,
@@ -77,8 +73,8 @@ public class AccessLogController {
 
             workLogService.saveWorkLog(operatorId, "ALL", "접속 기록", "ACCESS_LOG_SEARCH", details, ip);
         } else {
-            // [전체 조회 로그 저장]
-            workLogService.saveWorkLog(operatorId, "ALL", "접속 기록", "ACCESS_LOG_VIEW", "접속 이력 전체 조회", ip);
+            // 2. 검색 조건이 없을 때 -> "메뉴 접근" 로그
+            workLogService.saveWorkLog(operatorId, "ALL", "접속 기록", "ACCESS_LOG_VIEW", "메뉴 접근", ip);
         }
 
         return accessLogService.getAllLogs();

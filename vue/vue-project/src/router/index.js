@@ -24,13 +24,28 @@ import WorkLog from '@/components/WorkLog.vue'
 
 import BoardDetail from '@/components/BoardDetail.vue'
 import BoardList from '@/components/BoardList.vue'
+import UserBoardDetail from '@/components/UserBoardDetail.vue'
+import UserBoardList from '@/components/UserBoardList.vue'
 
 import AdList from '@/components/AdList.vue'
 import AdRegi from '@/components/AdRegi.vue'
 
+import policy from '@/components/policy.vue'
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/AboutView.vue')
+    },
+    {
+      path: '/policy',
+      name: 'policy',
+      component: policy
+    },
     {
       path: '/',
       name: 'home',
@@ -52,55 +67,6 @@ const router = createRouter({
       component: IdInquiry
     },
     {
-      path: '/Admin-Home',
-      name: 'Admin-Home',
-      component: AdminHome
-    },
-    {
-      path: '/Admin-List',
-      name: 'AdminList',
-      component: AdminList,
-      meta: { requiresAuth: true, accessLevel: 1 }
-    },
-    {
-      path: '/Admin/:id',
-      name: 'AdminDetail',
-      component: AdminDetail,
-      meta: { requiresAuth: true, accessLevel: 1 }
-    },
-    {
-      path: '/Admin-Join',
-      name: 'AdminJoin',
-      component: AdminJoin,
-      meta: { requiresAuth: true, accessLevel: 1 }
-    },
-    {
-      path: '/User-List',
-      name: 'UserList',
-      component: UserList,
-      meta: { requiresAuth: true, accessLevel: 1 }
-    },
-    {
-      path: '/User/:id',
-      name: 'UserDetail',
-      component: UserDetail,
-      meta: { requiresAuth: true, accessLevel: 1 }
-    },
-
-    {
-      path: '/Voc-Home',
-      name: 'VocHome',
-      component: VocHome,
-      meta: { requiresAuth: true, accessLevel: 2 }
-    },
-    {
-      path: '/User-Home',
-      name: 'UserHome',
-      component: UserHome,
-      meta: { requiresAuth: true, accessLevel: 3 }
-    },
-
-    {
       path: '/My/:id',
       name: 'MyPage',
       component: MyPage,
@@ -110,28 +76,62 @@ const router = createRouter({
       name: 'MypageAuth',
       component: MypageAuth,
     },
-
-    //추가
-    {
+    //관리자 접근 메뉴 
+    {//1
+      path: '/Admin-Home',
+      name: 'Admin-Home',
+      component: AdminHome,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    { //1
+      path: '/Admin-List',
+      name: 'AdminList',
+      component: AdminList,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    { //1
+      path: '/Admin/:id',
+      name: 'AdminDetail',
+      component: AdminDetail,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    { //1
+      path: '/Admin-Join',
+      name: 'AdminJoin',
+      component: AdminJoin,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    { //1
+      path: '/User/:id',
+      name: 'UserDetail',
+      component: UserDetail,
+      meta: { requiresAuth: true, accessLevel: 1 }
+    },
+    { //1
       path: '/access-logs',
       name: 'AccessLog',
       component: AccessLog,
       meta: { requiresAuth: true, accessLevel: 1 }
     },
-    {
+    { //1
       path: '/work-logs',
       name: 'WorkLog',
       component: WorkLog,
       meta: { requiresAuth: true, accessLevel: 1 }
     },
-
-    // Board 관련
-    {//3
-      path: '/Board',
-      name: 'Board',
-      component: Board,
-      meta: { requiresAuth: true, accessLevel: 3 }
-
+    // 상담원 접근 메뉴
+    { //2
+      path: '/Voc-Home',
+      name: 'VocHome',
+      component: VocHome,
+      meta: { requiresAuth: true, accessLevel: 2 }
+    },
+    // 관리자+상담원 접근 메뉴
+    { //1, 2
+      path: '/User-List',
+      name: 'UserList',
+      component: UserList,
+      meta: { requiresAuth: true, accessLevel: [1, 2] }
     },
     { //1, 2 
       path: '/BoardList',
@@ -143,7 +143,27 @@ const router = createRouter({
       path: '/Board/:id',
       name: 'BoardDetail',
       component: BoardDetail,
-      props: true  // params를 props로 전달
+      props: true,  // params를 props로 전달
+      meta: { requiresAuth: true, accessLevels: [1, 2] }
+    },
+    {//1, 2
+      path: '/AdList',
+      name: 'AdList',
+      component: AdList,
+      meta: { requiresAuth: true, accessLevels: [1, 2] }
+    },
+    // 고객 접근 메뉴
+    { //3
+      path: '/User-Home',
+      name: 'UserHome',
+      component: UserHome,
+      meta: { requiresAuth: true, accessLevel: 3 }
+    },
+    {//3
+      path: '/Board',
+      name: 'Board',
+      component: Board,
+      meta: { requiresAuth: true, accessLevels: 3 }
     },
     {//3
       path: '/AdRegi',
@@ -151,20 +171,19 @@ const router = createRouter({
       component: AdRegi,
       meta: { requiresAuth: true, accessLevel: 3 }
     },
-    {//1,2
-      path: '/AdList',
-      name: 'AdList',
-      component: AdList,
-      meta: { requiresAuth: true, accessLevels: [1, 2] }
+    {
+      path: '/UserBoardList',
+      name: 'UserBoardList',
+      component: UserBoardList,
+      meta: { requiresAuth: true, accessLevel: 3 }
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    }
+      path: '/UserBoard/:id',
+      name: 'UserBoardDetail',
+      component: UserBoardDetail,
+      meta: { requiresAuth: true, accessLevel: 3 }, props: true
+    },
+
   ]
 })
 
@@ -184,10 +203,12 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     if (!token) {
       alert('로그인이 필요합니다.');
-      return next('/loginForm');
+      return next('/');
     }
 
     const requiredLevel = to.meta.accessLevel || 3;
+    console.log("필요 레벨(requiredLevel) : ", requiredLevel);
+    console.log("내 권한 레벨(accessLevel) : ", accessLevel);
     if (accessLevel > requiredLevel) {
       alert(`접근 권한이 없습니다. (필요 레벨: ${requiredLevel}, 현재 레벨: ${accessLevel})`);
 
@@ -201,8 +222,5 @@ router.beforeEach((to, from, next) => {
 
   next();
 });
-
-
-
 
 export default router

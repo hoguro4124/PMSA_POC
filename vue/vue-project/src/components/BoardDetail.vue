@@ -1,6 +1,6 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h2 class="h3 fw-bold mb-4 text-start">문의사항 상세</h2>
+        <h1 class="h3 fw-bold mb-4 text-start">문의사항 상세</h1>
 
         <form>
             <!-- 제목 -->
@@ -52,7 +52,7 @@
 
                 <!-- 오른쪽 목록 버튼 -->
                 <div>
-                    <button type="button" class="btn btn-success btn-small" @click="goToBoardList">
+                    <button type="button" class="btn btn-success btn-small" @click="$router.push('/BoardList')">
                         목록
                     </button>
                 </div>
@@ -82,6 +82,7 @@
 }
 </style>
 
+
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -102,9 +103,6 @@ const newComment = ref(""); // 댓글 입력을 위한 변수
 
 const boardId = route.params.id;
 
-const goToBoardList = () => {
-    router.push("/BoardList");
-};
 
 const getBoard = async () => {
     try {

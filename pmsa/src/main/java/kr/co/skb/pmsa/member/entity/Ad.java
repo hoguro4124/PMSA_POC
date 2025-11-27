@@ -9,15 +9,16 @@ public class Ad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "_id")
     private Long id;
 
     @Column(name = "ad_title", nullable = false, length = 200)
     private String adTitle;
 
-    @Column(name = "ad_start_date")
+    @Column(name = "ad_start_at")
     private LocalDateTime adStartDate;
 
-    @Column(name = "ad_end_date")
+    @Column(name = "ad_end_at")
     private LocalDateTime adEndDate;
 
     @Column(name = "ad_attach", length = 255)
@@ -26,7 +27,7 @@ public class Ad {
     @Column(name = "user_id", nullable = false, length = 50)
     private String userId;
 
-    @Column(name = "ad_reg_date")
+    @Column(name = "ad_reg_at")
     private LocalDateTime adRegDate;
 
     // Getters and Setters

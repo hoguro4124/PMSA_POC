@@ -2,7 +2,6 @@ package kr.co.skb.pmsa.member.controller;
 
 import kr.co.skb.pmsa.member.entity.Board;
 import kr.co.skb.pmsa.member.repository.BoardRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;

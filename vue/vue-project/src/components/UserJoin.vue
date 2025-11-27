@@ -1,6 +1,6 @@
 <template>
   <main class="form-signin w-100 m-auto">
-    <h2 class="h3 fw-bold mb-4 text-center">회원 가입</h2>
+    <h1 class="h3 fw-bold mb-4 text-center">회원 가입</h1>
     <form @submit.prevent="submitUser" class="mb-4">
       <div class="mb-3">
         <input v-model="user.userId" placeholder="ID" class="form-control input-small" />

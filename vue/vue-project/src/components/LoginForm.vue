@@ -86,9 +86,6 @@ export default {
 
         alert('로그인 성공');
 
-        // ▼▼▼ [핵심 수정] 메뉴가 바로 뜨도록 '강제 새로고침 이동' 사용 ▼▼▼
-        // router.push 대신 location.href를 쓰면 페이지가 완전히 새로 로딩되면서
-        // Navbar도 '어? 로그인됐네?' 하고 메뉴를 다시 그립니다.
 
         if (accessLevel === 1) {
           window.location.href = '/Admin-Home';
@@ -99,7 +96,7 @@ export default {
         } else {
           window.location.href = '/';
         }
-        // ▲▲▲ [수정 끝] ▲▲▲
+
 
       } catch (error) {
         console.error(error);

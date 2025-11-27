@@ -1,6 +1,6 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">문의사항 목록</h1>
+        <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">나의 문의사항</h1>
 
         <!-- 검색창 -->
         <form class="mb-3 d-flex" @submit.prevent="performSearch">
@@ -12,27 +12,27 @@
         <table class="table table-bordered table-striped align-middle">
             <thead>
                 <tr class="table-light">
-                    <th style="width: 40px;" class="text-center">번호</th>
-                    <th style="width: 200px;" class="text-center">제목</th>
-                    <th style="width: 100px;" class="text-center">답변</th>
-                    <th style="width: 120px;" class="text-center">작성일</th>
+                    <th style="width: 40px;">번호</th>
+                    <th style="width: 120px;">제목</th>
+                    <th style="width: 100px;">답변</th>
+                    <th style="width: 120px;">작성일</th>
                 </tr>
             </thead>
-
-
             <tbody>
                 <tr v-for="board in paginatedBoards" :key="board.id">
                     <td class="text-center">{{ board.id }}</td>
-                    <td class="text-center " @click.prevent="goToBoardDetail(board.id)" style="cursor: pointer;">
+
+                    <td class="text-center " @click.prevent="goToUserBoardDetail(board.id)" style="cursor: pointer;">
                         {{ board.title }}</td>
                     <td class="text-center">
                         {{ board.comment && board.comment.trim() !== '' ? '답변완료' : '답변대기' }}
                     </td>
                     <td class="text-center">{{ formatDate(board.createdAt) }}</td>
                 </tr>
+                <tr v-if="paginatedBoards.length === 0">
+                    <td colspan="4" class="text-center py-6 text-gray-500">등록된 문의사항이 없습니다.</td>
+                </tr>
             </tbody>
-
-
         </table>
 
         <!-- 페이지네이션 -->
@@ -57,6 +57,8 @@ export default {
             search: '',
             currentPage: 1,
             pageSize: 10,
+            userId: String(localStorage.getItem('userId') || '').trim(),
+            accessLevel: Number(localStorage.getItem('accessLevel') || 99),
         }
     },
     computed: {
@@ -75,14 +77,26 @@ export default {
         }
     },
     methods: {
+        checkAccess() {
+            if (this.accessLevel !== 3) {
+                alert('접근 권한이 없습니다.')
+                this.$router.push('/')
+            }
+        },
         async getBoards() {
             try {
                 const response = await axios.get('http://localhost:8080/board')
-                this.boards = response.data
+                let allBoards = response.data
 
-                // 작성일(createdAt) 기준 내림차순 정렬
-                this.boards.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                // 본인 글만 필터링
+                allBoards = allBoards.filter(
+                    b => String(b.userId || '').trim() === this.userId
+                )
 
+                // 작성일 기준 내림차순 정렬
+                allBoards.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+                this.boards = allBoards
             } catch (error) {
                 alert('조회 실패: ' + error)
             }
@@ -92,14 +106,14 @@ export default {
             this.currentPage = 1
         },
         formatDate(dateStr) {
-            const date = new Date(dateStr)
-            return date.toLocaleString() // YYYY-MM-DD HH:MM:SS 형식
+            return new Date(dateStr).toLocaleString()
         },
-        goToBoardDetail(id) {
-            this.$router.push(`/Board/${id}`)
+        goToUserBoardDetail(id) {
+            this.$router.push(`/UserBoard/${id}`)
         }
     },
     mounted() {
+        this.checkAccess()
         this.getBoards()
     }
 }
@@ -131,13 +145,9 @@ export default {
 .table {
     width: 100%;
     table-layout: fixed;
-    border-collapse: collapse;
 }
 
-th {
-    text-align: center;
-}
-
+th,
 td {
     text-align: center;
     vertical-align: middle;

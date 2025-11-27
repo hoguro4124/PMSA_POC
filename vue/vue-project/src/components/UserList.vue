@@ -80,7 +80,7 @@
 }
 
 .table {
-    width: 900px;
+
     table-layout: fixed;
 }
 
@@ -144,7 +144,7 @@ export default {
                     headers: { 'Authorization': `Bearer ${token}` },
                     params: params
                 });
-
+                console.log(">>> [UserList] 서버 회신:", response.data);
                 this.users = response.data;
                 this.currentPage = 1;
 

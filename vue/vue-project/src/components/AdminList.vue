@@ -86,7 +86,7 @@
 }
 
 .table {
-    width: 900px;
+
     table-layout: fixed;
 }
 
@@ -143,13 +143,14 @@ export default {
                     params.keyword = keyword;
                 }
 
+                console.log(">>> [UserList] 서버 요청:", params);
                 // 전체 목록을 가져와서 프론트에서 필터링 (관리자 목록이지만 검색 등을 위해 전체 호출 후 필터링이 안전할 수 있음)
-                // 또는 백엔드에서 /users/admins API를 쓰면 더 좋음 (하지만 현재 로직 유지를 위해 /users 사용)
-                const response = await axios.get('http://localhost:8080/users', {
+                const response = await axios.get('http://localhost:8080/users/admins', {
                     headers: { 'Authorization': `Bearer ${token}` },
                     params: params
-                });
 
+                });
+                console.log(">>> [UserList] 서버 요청2:", response.data);
                 this.users = response.data;
                 this.currentPage = 1;
 

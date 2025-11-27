@@ -1,3 +1,4 @@
+
 package kr.co.skb.pmsa.member.controller;
 
 import kr.co.skb.pmsa.member.service.WorkLogService;
@@ -37,9 +38,7 @@ public class UserController {
     @Autowired
     private WorkLogService workLogService;
 
-    // ==================================================================
-    // [IP Helper] IPv6 -> IPv4 변환
-    // ==================================================================
+    // [IP Helper]
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("Proxy-Client-IP"); }
@@ -51,9 +50,7 @@ public class UserController {
         return ip;
     }
 
-    // ==================================================================
-    // [Token Helper] 토큰에서 작업자 ID 추출
-    // ==================================================================
+    // [Token Helper]
     private String getOperatorId(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -68,18 +65,15 @@ public class UserController {
         return "ANONYMOUS";
     }
 
-    // ==================================================================
-    // [Menu Helper] 메뉴명 자동 결정
-    // ==================================================================
+    // [Menu Helper]
     private String determineMenuName(String operatorId, User targetUser) {
         if (operatorId.equals(targetUser.getUserId())) return "마이페이지";
-        if (targetUser.getAccessLevel() == 1) return "관리자 목록 > 상세";
+        if (targetUser.getAccessLevel() < 3) return "관리자 목록 > 상세";
         return "고객 목록 > 상세";
     }
 
-
     // ==================================================================
-    // 1. 관리자 목록 조회 & 검색
+    // 1. 관리자 목록 조회 & 검색 (Level 1, 2 포함)
     // ==================================================================
     @GetMapping("/admins")
     public List<User> getAllAdmins(
@@ -89,20 +83,25 @@ public class UserController {
         String operatorId = getOperatorId(request);
         String ip = getClientIp(request);
 
+        // 1) 검색어가 있는 경우
         if (keyword != null && !keyword.trim().isEmpty()) {
             String details = "관리자 검색 (키워드: " + keyword + ")";
             workLogService.saveWorkLog(operatorId, "ALL", "관리자 목록", "ADMIN_SEARCH", details, ip);
+
+            // 레벨 1, 2 중에서 검색 (UserRepository에 searchAdmins 쿼리가 < 3 이어야 함)
             return userRepository.searchAdmins(keyword);
-        } else {
-            workLogService.saveWorkLog(operatorId, "ALL", "관리자 목록", "ADMIN_LIST_VIEW", "관리자(Level 1) 전체 조회", ip);
-            return userRepository.findByAccessLevel(1);
+        }
+        // 2) 전체 조회 (검색어 없음)
+        else {
+            workLogService.saveWorkLog(operatorId, "ALL", "관리자 목록", "ADMIN_LIST_VIEW", "관리자(Level 1,2) 전체 조회", ip);
+
+            // [핵심 수정] 레벨 1만 가져오던 것을 -> 레벨 3 미만(1, 2) 모두 가져오도록 변경
+            return userRepository.findByAccessLevelLessThan(3);
         }
     }
 
 
-    // ==================================================================
     // 2. 일반 고객 목록 조회 & 검색
-    // ==================================================================
     @GetMapping
     public List<User> getAllUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -121,10 +120,7 @@ public class UserController {
         }
     }
 
-
-    // ==================================================================
     // 3. 상세 조회
-    // ==================================================================
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable int id, HttpServletRequest request) {
         Optional<User> userOpt = userRepository.findById(id);
@@ -133,17 +129,13 @@ public class UserController {
             String operatorId = getOperatorId(request);
             String ip = getClientIp(request);
             String menuName = determineMenuName(operatorId, user);
-
             workLogService.saveWorkLog(operatorId, user.getUserId(), menuName, "USER_DETAIL_VIEW", "상세 정보 조회", ip);
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.notFound().build();
     }
 
-
-    // ==================================================================
     // 4. 중복 확인
-    // ==================================================================
     @GetMapping("/check-id/{userId}")
     public ResponseEntity<Map<String, Boolean>> checkUserId(@PathVariable String userId) {
         boolean exists = userRepository.findByUserId(userId).isPresent();
@@ -152,51 +144,29 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-
-    // ==================================================================
-    // 5. 생성 (회원가입/관리자생성) - [비밀번호 마스킹 적용됨]
-    // ==================================================================
+    // 5. 생성
     @PostMapping
     public User createUser(@RequestBody User user, HttpServletRequest request) {
-        // 1. 실제 비밀번호 암호화 (DB 저장용)
         String hashedPassword = HashUtil.sha256(user.getPassword());
         user.setPassword(hashedPassword);
-
-        // 2. DB 저장
         User savedUser = userRepository.save(user);
-
-        // 3. 로그 정보 준비
         String operatorId = getOperatorId(request);
         String ip = getClientIp(request);
         String menuName = "ANONYMOUS".equals(operatorId) ? "회원가입" : "관리자 목록";
-        String actionType = "USER_CREATE";
+        String details = "ANONYMOUS".equals(operatorId) ? "본인 가입" : "관리자 생성";
+        if("ANONYMOUS".equals(operatorId)) operatorId = savedUser.getUserId();
 
-        // 4. [핵심] 로그 상세 내용 구성 (비밀번호는 ** 로 하드코딩)
-        String details = String.format(
-                "신규 계정 생성 [ID: %s, 이름: %s, 전화: %s, 이메일: %s, 권한: %s, 비밀번호: **]",
-                savedUser.getUserId(),
-                savedUser.getName(),
-                savedUser.getPhone(),
-                savedUser.getEmail(),
-                savedUser.getAccessLevel()
+        String secureDetails = String.format(
+                "신규 계정 생성 [ID: %s, 이름: %s, 권한: %s, 비밀번호: **(보안처리됨)]",
+                savedUser.getUserId(), savedUser.getName(), savedUser.getAccessLevel()
         );
+        if("ANONYMOUS".equals(operatorId)) secureDetails = details;
 
-        // 본인 가입(비로그인)인 경우 처리
-        if("ANONYMOUS".equals(operatorId)) {
-            operatorId = savedUser.getUserId();
-            // 본인 가입은 간략하게 남겨도 됨 (선택사항)
-            // details = "사용자 본인 회원가입";
-        }
-
-        workLogService.saveWorkLog(operatorId, savedUser.getUserId(), menuName, actionType, details, ip);
-
+        workLogService.saveWorkLog(operatorId, savedUser.getUserId(), menuName, "USER_CREATE", secureDetails, ip);
         return savedUser;
     }
 
-
-    // ==================================================================
     // 6. 삭제
-    // ==================================================================
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable int id, HttpServletRequest request) {
         Optional<User> targetUser = userRepository.findById(id);
@@ -211,27 +181,20 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-
-    // ==================================================================
     // 7. 수정
-    // ==================================================================
     @PutMapping("/{id}")
     public User updateUser(@PathVariable int id, @RequestBody User updatedUser, HttpServletRequest request) {
         return userRepository.findById(id).map(user -> {
-
             String operatorId = getOperatorId(request);
             String ip = getClientIp(request);
             String details = "정보 수정 (" + updatedUser.getName() + ")";
             String menuName = determineMenuName(operatorId, user);
-
             workLogService.saveWorkLog(operatorId, user.getUserId(), menuName, "USER_UPDATE", details, ip);
-
             user.setName(updatedUser.getName());
             user.setPhone(updatedUser.getPhone());
             user.setEmail(updatedUser.getEmail());
             user.setMaAgree(updatedUser.isMaAgree());
             user.setAccessLevel(updatedUser.getAccessLevel());
-
             String pw = updatedUser.getPassword();
             if (pw != null && !pw.trim().isEmpty()) {
                 user.setPassword(HashUtil.sha256(pw));
@@ -240,10 +203,7 @@ public class UserController {
         }).orElseThrow(() -> new RuntimeException("사용자 없음"));
     }
 
-
-    // ==================================================================
     // 8. 로그인
-    // ==================================================================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData, HttpServletRequest request) {
         String userId = loginData.get("userId");
@@ -256,7 +216,6 @@ public class UserController {
 
         if (user.isPresent()) {
             User loggedInUser = user.get();
-
             String type = (loggedInUser.getAccessLevel() == 1) ? "ADMIN_LOGIN" : "LOGIN";
             try { accessLogService.saveLog(userId, ipAddress, type); } catch (Exception e) {}
 

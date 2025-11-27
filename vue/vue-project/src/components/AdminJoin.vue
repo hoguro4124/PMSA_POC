@@ -14,11 +14,19 @@
                 <option value="2">상담사</option>
             </select>
         </div>
-
-        <!-- 저장 버튼 -->
-        <button @click="submitUser" class="btn btn-primary btn-small">
-            저장
-        </button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button @click="submitUser" class="btn btn-primary btn-small">
+                    저장
+                </button>
+            </div>
+            <!-- 목록 버튼 -->
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-success btn-small" @click="$router.push('/Admin-List')">
+                    목록
+                </button>
+            </div>
+        </div>
     </main>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h2 class="h3 fw-bold mb-4 text-center">비밀번호 재확인</h2>
+        <h1 class="h3 fw-bold mb-4 text-center">비밀번호 재확인</h1>
         <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="form-control input-small mb-3" />
         <button @click="verifyPassword" class="btn btn-primary btn-small w-100">
             확인

@@ -28,7 +28,7 @@ public class AccessLog {
 
     // 5. 접속 일시 (로그가 기록된 시간 - 자동으로 생성되도록 설정)
     @CreationTimestamp
-    @Column(name = "log_time", nullable = false, updatable = false)
+    @Column(name = "log_at", nullable = false, updatable = false)
     private LocalDateTime logTime;
 
 

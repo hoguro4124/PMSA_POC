@@ -10,6 +10,7 @@ public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "_id")
     private int id;
 
     @Column(name = "user_id", nullable = false)

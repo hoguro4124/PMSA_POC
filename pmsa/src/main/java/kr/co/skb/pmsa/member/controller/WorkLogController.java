@@ -2,6 +2,7 @@ package kr.co.skb.pmsa.member.controller;
 
 import kr.co.skb.pmsa.member.entity.WorkLog;
 import kr.co.skb.pmsa.member.service.WorkLogService;
+import kr.co.skb.pmsa.member.repository.WorkLogRepository; // Repository 직접 사용
 import kr.co.skb.pmsa.member.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
@@ -9,15 +10,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
-@RequestMapping("work_logs")
+@RequestMapping("/api/work-logs")
 public class WorkLogController {
 
     @Autowired
     private WorkLogService workLogService;
+
+    @Autowired
+    private WorkLogRepository workLogRepository;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -45,6 +50,7 @@ public class WorkLogController {
 
     @GetMapping
     public List<WorkLog> getAllWorkLogs(
+            @RequestParam(required = false, defaultValue = "ADMIN") String userLevelType,
             @RequestParam(required = false) String searchOperatorId,
             @RequestParam(required = false) String actionType,
             @RequestParam(required = false) String startDate,
@@ -54,15 +60,16 @@ public class WorkLogController {
         String operatorId = getOperatorId(request);
         String ip = getClientIp(request);
 
-        System.out.println(">>> [WorkLog] 검색 요청: ID=" + searchOperatorId + ", Type=" + actionType);
-
-        boolean isSearch = (searchOperatorId != null && !searchOperatorId.trim().isEmpty()) ||
+        // [수정] 실제 검색 조건만 체크 (userLevelType은 기본값이 있어서 제외)
+        boolean hasSearchCondition = (searchOperatorId != null && !searchOperatorId.trim().isEmpty()) ||
                 (actionType != null && !"ALL".equals(actionType)) ||
                 (startDate != null && !startDate.isEmpty()) ||
                 (endDate != null && !endDate.isEmpty());
 
-        if (isSearch) {
-            String details = String.format("검색 조건 [작업자: %s, 유형: %s, 기간: %s~%s]",
+        if (hasSearchCondition) {
+            // 1. 검색 조건이 있음 -> "검색" 로그
+            String details = String.format("검색 조건 [대상: %s, 작업자: %s, 유형: %s, 기간: %s~%s]",
+                    userLevelType,
                     (searchOperatorId == null || searchOperatorId.isEmpty()) ? "-" : searchOperatorId,
                     (actionType == null || "ALL".equals(actionType)) ? "-" : actionType,
                     (startDate == null || startDate.isEmpty()) ? "-" : startDate,
@@ -70,9 +77,18 @@ public class WorkLogController {
 
             workLogService.saveWorkLog(operatorId, "ALL", "작업 기록", "WORK_LOG_SEARCH", details, ip);
         } else {
-            workLogService.saveWorkLog(operatorId, "ALL", "작업 기록", "WORK_LOG_VIEW", "작업 이력 전체 조회", ip);
+            // 2. 검색 조건 없음 -> "메뉴 접근" 로그
+            workLogService.saveWorkLog(operatorId, "ALL", "작업 기록", "WORK_LOG_VIEW", "메뉴 접근", ip);
         }
 
-        return workLogService.getAllLogs();
+        // DB 조회 로직
+        List<Integer> targetLevels;
+        if ("GENERAL".equals(userLevelType)) {
+            targetLevels = Arrays.asList(3);
+        } else {
+            targetLevels = Arrays.asList(1, 2);
+        }
+
+        return workLogRepository.findByOperatorLevelIn(targetLevels);
     }
 }

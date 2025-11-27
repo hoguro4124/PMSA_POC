@@ -20,7 +20,8 @@
             <!-- 광고 종료일 -->
             <div class="mb-3">
                 <label for="adEndDate" class="form-label fw-semibold">광고 종료일</label>
-                <input v-model="ad.adEndDate" type="date" id="adEndDate" class="form-control input-small" required />
+                <input v-model="ad.adEndDate" type="date" id="adEndDate" class="form-control input-small"
+                    :min="ad.adStartDate" required />
             </div>
 
             <!-- 광고 파일 업로드 -->

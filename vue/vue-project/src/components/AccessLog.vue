@@ -91,7 +91,6 @@
 
 
 .table {
-    width: 900px;
     table-layout: fixed;
 }
 
@@ -124,7 +123,7 @@ export default {
             // 실제 필터링용 값 (화면 목록 필터링)
             searchUserId: '', searchActionType: 'ALL', searchStartDate: '', searchEndDate: '',
             currentPage: 1,
-            pageSize: 10,
+            pageSize: 100,
             actionTypes: [
                 { value: 'LOGIN', text: '일반 로그인' },
                 { value: 'ADMIN_LOGIN', text: '관리자 로그인' },

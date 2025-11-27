@@ -15,18 +15,21 @@
                         <router-link class="nav-link" to="/">홈</router-link>
                     </li>
 
-                    <li class="nav-item" v-if="accessLevel === 1 || accessLevel === 2">
-                        <router-link class="nav-link" to="/AdList">광고 목록</router-link>
-                    </li>
-                    <li class="nav-item" v-if="accessLevel === 1 || accessLevel === 2">
-                        <router-link class="nav-link" to="/BoardList">문의 사항 목록</router-link>
-                    </li>
-                    <template v-if="accessLevel === 1">
+                    <template v-if="accessLevel === 1 || accessLevel === 2">
                         <li class="nav-item">
-                            <router-link class="nav-link" to="/Admin-List">관리자 목록</router-link>
+                            <router-link class="nav-link" to="/AdList">광고 목록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/BoardList">문의 사항 목록</router-link>
                         </li>
                         <li class="nav-item">
                             <router-link class="nav-link" to="/User-List">고객 목록</router-link>
+                        </li>
+                    </template>
+
+                    <template v-if="accessLevel === 1">
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/Admin-List">관리자 목록</router-link>
                         </li>
                         <li class="nav-item">
                             <router-link class="nav-link" to="/Access-Logs">접속 기록</router-link>
@@ -36,20 +39,17 @@
                         </li>
                     </template>
 
-                    <li class="nav-item" v-if="accessLevel === 2">
-                        <router-link class="nav-link" to="/voc-home">VOC 페이지</router-link>
-                    </li>
-
-
-
-                    <li class="nav-item" v-if="accessLevel === 3">
-                        <router-link class="nav-link" to="/AdRegi">광고 등록</router-link>
-                    </li>
-                    <li class="nav-item" v-if="accessLevel === 3">
-                        <router-link class="nav-link" to="/board">문의 사항 등록</router-link>
-                    </li>
-
-
+                    <template v-if="accessLevel === 3">
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/AdRegi">광고 등록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/board">문의 사항 등록</router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/UserBoardList">나의 문의 사항</router-link>
+                        </li>
+                    </template>
 
                     <template v-if="isLoggedIn">
                         <li class="nav-item">

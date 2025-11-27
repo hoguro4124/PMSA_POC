@@ -34,7 +34,7 @@ public class WorkLog {
     private String ipAddress;  // IP
 
     @CreationTimestamp
-    @Column(name = "log_time", nullable = false, updatable = false)
+    @Column(name = "log_at", nullable = false, updatable = false)
     private LocalDateTime logTime;
 
     // 1. 기본 생성자 (JPA 필수)

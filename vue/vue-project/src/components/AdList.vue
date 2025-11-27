@@ -65,19 +65,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import axios from 'axios'
 
-const router = useRouter()
 const ads = ref([])
-
-onMounted(() => {
-    fetchAds()
-})
 
 const fetchAds = async () => {
     try {
-        const res = await axios.get('http://localhost:8080/ads')
+        const token = localStorage.getItem('token');
+        // [수정] 토큰 전송 -> AD_LIST_VIEW 로그 생성됨
+        const res = await axios.get('http://localhost:8080/ads', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         ads.value = res.data
     } catch (err) {
         console.error('광고 목록 조회 실패:', err)
@@ -86,11 +84,10 @@ const fetchAds = async () => {
 
 const formatDate = (dateString) => {
     if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toISOString().split('T')[0]
+    return dateString.split('T')[0]
 }
 
-const goToRegister = () => {
-    router.push('/AdRegi')
-}
+onMounted(() => {
+    fetchAds()
+})
 </script>

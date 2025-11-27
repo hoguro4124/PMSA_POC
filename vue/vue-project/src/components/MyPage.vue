@@ -1,9 +1,10 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h2 class="hh3 mb-3 fw-normal text-center border-bottom pb-2">사용자 상세 정보</h2>
+        <h1 class="hh3 mb-3 fw-normal text-center border-bottom pb-2">사용자 상세 정보</h1>
 
         <div v-if="user" class="d-flex flex-column gap-3"
             style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+
             <div>
                 <label class="form-label fw-semibold">ID:</label>
                 <div class="border rounded p-2 text-muted">{{ user.userId }}</div>

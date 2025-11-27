@@ -1,6 +1,6 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h2 class="h3 fw-bold mb-4 text-start">문의 사항 작성</h2>
+        <h1 class="h3 fw-bold mb-4 text-start">문의 사항 작성</h1>
 
         <form @submit.prevent="handleSubmit">
             <!-- 문의 제목 -->
@@ -17,9 +17,17 @@
                     required></textarea>
             </div>
 
-            <!-- 버튼 -->
-            <div class="d-flex gap-3 justify-content-center">
-                <button type="submit" class="btn btn-dark btn-small flex-fill">작성 완료</button>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-small flex-fill">작성 완료</button>
+                    <!-- 목록 버튼 -->
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="submit" class="btn btn-success btn-small flex-fill"
+                        @click="$router.push('/BoardList')"> 목록
+                    </button>
+                </div>
             </div>
         </form>
     </main>
@@ -51,6 +59,7 @@
 }
 </style>
 
+
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -63,27 +72,31 @@ const post = ref({
     content: ""
 });
 
+// 팝업 상태
+const showConfirmation = ref(false);
 
 // 등록 처리
 const handleSubmit = async () => {
-    const user_id = localStorage.getItem("userId"); // 로그인한 사용자 ID
+    const user_id = localStorage.getItem("userId");
 
     if (!user_id) {
         alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
         return;
     }
-    if (!post.value.title || !post.value.content) {
+
+    if (!post.value.title.trim() || !post.value.content.trim()) {
         alert("제목과 내용을 모두 입력해주세요.");
         return;
     }
+
     // 보내는 데이터 확인
     const payload = {
         title: post.value.title,
         content: post.value.content,
         userId: user_id
     };
-    console.log("보내는 데이터:", payload);
 
+    console.log("보내는 데이터:", payload);
 
     try {
         const response = await axios.post(
@@ -97,9 +110,9 @@ const handleSubmit = async () => {
         );
 
         console.log("서버 응답:", response);
-        router.push("/user-home");
-        alert("문의사항이 등록되었습니다.");
 
+        alert("문의사항이 등록되었습니다.");
+        router.push("/BoardList")
 
     } catch (error) {
         console.error("등록 실패 상세:", error);

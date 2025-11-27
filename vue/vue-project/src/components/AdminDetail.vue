@@ -1,39 +1,42 @@
 <template>
     <main class="form-signin w-100 m-auto">
-        <h2 class="h3 fw-bold mb-4 text-start">사용자 상세 정보</h2>
+        <h1 class="hh3 mb-3 fw-normal text-center border-bottom pb-2">사용자 상세 정보</h1>
 
-        <div v-if="user">
-            <div class="mb-3">
+        <div v-if="user" class="d-flex flex-column gap-3"
+            style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+
+            <div>
                 <label class="form-label fw-semibold">ID:</label>
-                <span class="d-block">{{ user.userId }}</span>
+                <div class="border rounded p-2 text-muted">{{ user.userId }}</div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">이름:</label>
-                <span v-if="!editMode" class="d-block">
+            <div>
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">이름:</label>
+                <div v-if="!editMode" class="border rounded p-2">
                     {{ masKed ? maskName(user.name) : user.name }}
-                </span>
+                </div>
                 <input v-else v-model="user.name" class="form-control input-small" />
             </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold">전화번호:</label>
-                <span class="d-block">{{ user.phone }}</span>
+            <div>
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">전화번호:</label>
+                <div v-if="!editMode" class="border rounded p-2">
+                    {{ user.phone }}
+                </div>
+                <input v-else v-model="user.phone" class="form-control input-small" />
             </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold">이메일:</label>
-                <span v-if="!editMode" class="d-block">
+            <div>
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">이메일:</label>
+                <div v-if="!editMode" class="border rounded p-2">
                     {{ masKed ? maskEmail(user.email) : user.email }}
-                </span>
+                </div>
                 <input v-else v-model="user.email" class="form-control input-small" />
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-semibold">권한:</label>
-                <span v-if="!editMode" class="d-block">
+                <label class="form-label fw-semibold" :class="{ 'text-danger': editMode }">권한:</label>
+                <div v-if="!editMode" class="border rounded p-2 text-muted">
                     {{ formatAccessLevel(user.accessLevel) }}
-                </span>
+                </div>
                 <select v-else v-model.number="user.accessLevel" class="form-select input-small">
                     <option :value="1">최고관리자</option>
                     <option :value="2">상담사</option>
@@ -45,22 +48,28 @@
             <p>사용자 정보를 불러오는 중...</p>
         </div>
 
-        <div class="d-flex gap-2 mt-4 flex-wrap">
-            <button @click="toggleMask" class="btn btn-primary btn-small flex-fill">
-                {{ masKed ? '마스킹 해제' : '마스킹 적용' }}
-            </button>
 
-            <button @click="editMode = !editMode" class="btn btn-warning btn-small flex-fill">
-                {{ editMode ? '수정 취소' : '수정하기' }}
-            </button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2 mt-4 flex-wrap">
 
-            <button v-if="editMode" @click="updateUser" class="btn btn-primary btn-small flex-fill">
-                저장
-            </button>
-
-            <button v-if="editMode" @click="deleteUser" class="btn btn-danger btn-small flex-fill">
-                삭제
-            </button>
+                <button @click="toggleMask" class="btn btn-info btn-small flex-fill">
+                    {{ masKed ? '마스킹 해제' : '마스킹 적용' }}
+                </button>
+                <button @click="editMode = !editMode" class="btn btn-warning btn-small flex-fill">
+                    {{ editMode ? '수정 취소' : '수정하기' }}
+                </button>
+                <button v-if="editMode" @click="updateUser" class="btn btn-primary btn-small flex-fill">
+                    저장
+                </button>
+                <button v-if="editMode" @click="deleteUser" class="btn btn-danger btn-small flex-fill">
+                    삭제
+                </button>
+            </div>
+            <div class="d-flex gap-2 mt-4 flex-wrap  justify-content-center">
+                <button type="button" class="btn btn-success btn-small flex-fill" @click="$router.push('/Admin-List')">
+                    목록
+                </button>
+            </div>
         </div>
     </main>
 </template>
@@ -74,6 +83,12 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 0 10px #eee;
+}
+
+.d-flex>.btn {
+    min-width: 120px;
+    /* 혹은 원하는 고정 최소너비 */
+    text-align: center;
 }
 
 .input-small {
