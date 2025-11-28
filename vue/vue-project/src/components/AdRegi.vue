@@ -27,7 +27,7 @@
             <!-- 광고 파일 업로드 -->
             <div class="mb-3">
                 <label for="adFile" class="form-label fw-semibold">광고 파일</label>
-                <input type="file" id="adFile" @change="handleFileUpload" class="form-control"
+                <input type="file" id="adFile" ref="adFileInput" @change="handleFileUpload" class="form-control"
                     accept=".pdf,.jpg,.jpeg,.png,.txt" required />
                 <div v-if="fileError" class="text-danger small mt-1">
                     허용되지 않는 파일 형식입니다. (.pdf, .jpg, .jpeg, .png, .txt만 허용)
@@ -92,6 +92,25 @@ export default {
         this.ad.userId = localStorage.getItem('userId') || 'defaultUser'; // 예시로 로컬 스토리지에서 가져옴
     },
     methods: {
+        // 폼 리셋
+        resetForm() {
+            // ad 객체 초기화
+            this.ad.adTitle = '';
+            this.ad.adStartDate = '';
+            this.ad.adEndDate = '';
+            this.ad.adAttach = '';
+            this.ad.adRegDate = '';
+
+            // 파일/에러 상태 초기화
+            this.selectedFile = null;
+            this.fileError = false;
+
+            // 파일 input 비우기
+            if (this.$refs.adFileInput) {
+                this.$refs.adFileInput.value = '';
+            }
+        },
+
         // 파일 업로드 처리
         handleFileUpload(event) {
             const file = event.target.files[0]; // 파일 객체
@@ -103,10 +122,12 @@ export default {
                 if (!allowedExtensions.includes(fileExtension)) {
                     this.fileError = true; // 오류 표시
                     this.selectedFile = null; // 파일 초기화
+                    event.target.value = ''; // 잘못된 파일 선택 시 input도 비우기
                 } else {
                     this.fileError = false; // 오류 없으면
                     this.selectedFile = file;
                     this.ad.adAttach = file.name; // 파일 이름을 adAttach에 저장
+                    console.log('파일명 : ', file.name);
                 }
             }
         },
@@ -153,7 +174,9 @@ export default {
                 // 응답 확인
                 console.log("광고 등록 성공:", response);
                 alert('광고 등록이 완료되었습니다.');
-                // this.$router.push('/AdList'); // 광고 목록 페이지로 이동
+
+                this.resetForm(); // 알럿 후 폼 초기화
+
             } catch (error) {
                 console.error("광고 등록 오류:", error); // 오류가 발생하면 콘솔에 출력
                 if (error.response) {

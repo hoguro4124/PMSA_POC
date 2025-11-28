@@ -3,11 +3,8 @@
         <h1 class="h3 mb-3 fw-normal text-center border-bottom pb-2">광고 목록</h1>
 
 
-
         <!-- 테이블 카드 -->
-
         <table class="table table-bordered table-striped align-middle">
-
             <thead>
                 <tr class="table-light">
                     <th class="text-center" style="width: 60px;">번호</th>
@@ -27,15 +24,14 @@
                     <td class="text-center">{{ formatDate(ad.adEndDate) }}</td>
                     <td class="text-center">{{ ad.userId }}</td>
                     <td class="text-center">
-                        <a v-if="ad.adAttach" :href="`http://localhost:8080/ads/download/${ad.adAttach}`"
-                            target="_blank" class="text-primary text-decoration-underline">
+                        <a v-if="ad.adAttach" :href="'http://localhost:8080/ads/download/' + ad.adAttach"
+                            target="_blank" cla ss="text-blue-500 hover:underline">
                             다운로드
                         </a>
                         <span v-else>없음</span>
                     </td>
                     <td class="text-center">{{ formatDate(ad.adRegDate) }}</td>
                 </tr>
-
                 <tr v-if="ads.length === 0">
                     <td colspan="7" class="text-center py-4 text-muted">
                         등록된 광고가 없습니다.
@@ -43,9 +39,9 @@
                 </tr>
             </tbody>
         </table>
-
     </main>
 </template>
+
 
 <style scoped>
 .form-signin {
@@ -65,29 +61,43 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
+const router = useRouter()
+
+// 광고 목록을 저장할 변수
 const ads = ref([])
 
-const fetchAds = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        // [수정] 토큰 전송 -> AD_LIST_VIEW 로그 생성됨
-        const res = await axios.get('http://localhost:8080/ads', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        ads.value = res.data
-    } catch (err) {
-        console.error('광고 목록 조회 실패:', err)
-    }
-}
-
-const formatDate = (dateString) => {
-    if (!dateString) return ''
-    return dateString.split('T')[0]
-}
-
+// 페이지 로드 시 광고 목록을 가져옴
 onMounted(() => {
     fetchAds()
 })
+
+// 광고 목록 조회 API 호출
+const fetchAds = async () => {
+    try {
+        const res = await axios.get("http://localhost:8080/ads") // 백엔드에서 광고 목록 조회
+        ads.value = res.data
+        console.log(ads.value)
+
+        // 작성일(adRegDate) 기준 내림차순 정렬
+        ads.value.sort((a, b) => new Date(b.adRegDate) - new Date(a.adRegDate))
+
+    } catch (err) {
+        console.error("광고 목록 조회 실패:", err)
+    }
+}
+
+// 날짜 포맷팅 (yyyy-MM-dd 형식으로 변환)
+const formatDate = (dateString) => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    return date.toISOString().split('T')[0] // "2025-04-20" 형식으로 변환
+}
+
+// 광고 등록 페이지로 이동
+const goToRegister = () => {
+    router.push('/AdRegi') // 광고 등록 페이지로 이동
+}
 </script>

@@ -25,7 +25,7 @@
 
                 <div class="d-flex gap-3 justify-content-center">
                     <button type="submit" class="btn btn-success btn-small flex-fill"
-                        @click="$router.push('/BoardList')"> 목록
+                        @click="$router.push('/UserBoardList')"> 목록
                     </button>
                 </div>
             </div>
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
         console.log("서버 응답:", response);
 
         alert("문의사항이 등록되었습니다.");
-        router.push("/BoardList")
+        router.push("/UserBoardList")
 
     } catch (error) {
         console.error("등록 실패 상세:", error);

@@ -30,7 +30,8 @@
             <!-- 댓글 -->
             <div class="mb-4">
                 <label class="form-label fw-semibold">댓글</label>
-                <textarea v-model="newComment" class="form-control" rows="6" placeholder="댓글을 작성하세요..."></textarea>
+                <textarea v-model="newComment" class="form-control" rows="6"
+                    placeholder="댓글을 작성하세요...">{{ board.comment }}</textarea>
             </div>
 
 

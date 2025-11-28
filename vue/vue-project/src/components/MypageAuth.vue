@@ -5,9 +5,9 @@
         <button @click="verifyPassword" class="btn btn-primary btn-small w-100">
             확인
         </button>
-        <p v-if="error" class="text-danger mt-3 text-center">{{ error }}</p>
     </main>
 </template>
+
 
 <style scoped>
 .form-signin {
@@ -62,10 +62,10 @@ export default {
                 if (response.data && response.data.token) {
                     this.$router.push(`/My/${response.data.user.id}`);
                 } else {
-                    this.error = '비밀번호가 일치하지 않습니다.';
+                    alert('비밀번호가 일치하지 않습니다.');
                 }
             } catch (err) {
-                this.error = '비밀번호 확인 실패: ' + (err.response?.data || err.message);
+                alert('비밀번호가 일치하지 않습니다.');
             }
         }
     }
